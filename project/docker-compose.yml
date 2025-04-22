@@ -1,7 +1,15 @@
-version: "3.9"
-
 services:
-#  event-collector:
+  event-collector:
+    build:
+      context: ./../EventCollector
+      dockerfile: ./../EventCollector/Dockerfile
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      APP_ENV: docker
+      APP_CONF_PATH: "/app/"
+#      GIN_MODE: "release"
 
   redis:
     image: redis:latest
@@ -20,3 +28,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+
+networks:
+  adserver:
+    driver: bridge

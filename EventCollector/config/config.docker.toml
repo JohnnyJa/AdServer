@@ -1,7 +1,7 @@
 [app]
 name = "EventCollector"
-port = "8080"
+port = ":80"
 log_level = "debug"
 
 [redis]
-connection_string = "jdbc:redis://localhost:6379/0"
+connection_string = "redis://redis:6379/0"

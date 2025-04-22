@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
+	"os"
 )
 
 type Server struct {
@@ -51,6 +52,12 @@ func (s *Server) configureLogger() error {
 	}
 
 	s.logger.SetLevel(level)
+	s.logger.SetOutput(os.Stdout)
+	s.logger.SetFormatter(&logrus.TextFormatter{
+		FullTimestamp: true,
+	})
+
+	s.logger.Info("Logger configured")
 
 	return nil
 }
@@ -67,11 +74,15 @@ func (s *Server) configureRedis() error {
 	if err := r.Ping(context.Background()).Err(); err != nil {
 		return err
 	}
+
+	s.logger.Info("Redis configured")
 	return nil
 }
 
 func (s *Server) configureRouter() error {
 	r := router.New()
 	s.router = r
+
+	s.logger.Info("Router configured")
 	return nil
 }
