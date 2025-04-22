@@ -1,0 +1,7 @@
+[app]
+name = "EventCollector"
+port = ":8080"
+log_level = "debug"
+
+[redis]
+connection_string = "redis://localhost:6379/0"
