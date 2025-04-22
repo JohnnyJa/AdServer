@@ -6,4 +6,3 @@ COPY eventCollector /app
 COPY config/config.docker.toml /app
 
 CMD ["/app/eventCollector"]
-#ENTRYPOINT ["tail", "-f", "/dev/null"]

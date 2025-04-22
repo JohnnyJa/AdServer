@@ -34,8 +34,6 @@ func (p *Pool) write(data interface{}) {
 	if err != nil {
 		p.logger.Errorf("Failed to store request: %v", err)
 		//TODO: Create recovery logic
-		//fallBackBuffer.Save(data)
-		//wal.Save(data)
 	}
 }
 
