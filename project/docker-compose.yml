@@ -1,0 +1,30 @@
+services:
+  event-collector:
+    build:
+      context: ./../EventCollector
+      dockerfile: ./../EventCollector/Dockerfile
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      APP_ENV: docker
+      APP_CONF_PATH: "/app/"
+#      GIN_MODE: "release"
+
+  redis:
+    image: redis:latest
+    container_name: redis_container
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_PORT=6379
+      - REDIS_DATABASES=16
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./store/data:/data
+      - ./store/store.conf:/usr/local/etc/store/store.conf
+    healthcheck:
+      test: [ "CMD", "store-cli", "-a", "$REDIS_PASSWORD", "ping" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
