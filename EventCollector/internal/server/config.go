@@ -1,12 +1,12 @@
 package server
 
 import (
-	"github.com/JohnnyJa/AdServer/EventCollector/container/redis"
+	"github.com/JohnnyJa/AdServer/EventCollector/internal/store"
 )
 
 type Config struct {
 	AppConfig   *AppConfig    `toml:"app"`
-	RedisConfig *store.Config `toml:"redis"`
+	RedisConfig *store.Config `toml:"store"`
 }
 
 type AppConfig struct {

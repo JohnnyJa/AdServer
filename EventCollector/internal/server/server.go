@@ -1,26 +1,26 @@
 package server
 
 import (
-	"context"
-	"github.com/JohnnyJa/AdServer/EventCollector/container/router"
-	"github.com/gin-gonic/gin"
-	"github.com/redis/go-redis/v9"
+	"errors"
+	"github.com/JohnnyJa/AdServer/EventCollector/internal/router"
+	"github.com/JohnnyJa/AdServer/EventCollector/internal/store"
+	"github.com/JohnnyJa/AdServer/EventCollector/internal/worker"
 	"github.com/sirupsen/logrus"
 	"os"
 )
 
 type Server struct {
-	config *Config
-	logger *logrus.Logger
-	router *gin.Engine
-	redis  *redis.Client
+	config  *Config
+	logger  *logrus.Logger
+	router  *router.Router
+	store   *store.Store
+	workers *worker.Pool
 }
 
 func New(config *Config) *Server {
 	return &Server{
 		config: config,
 		logger: logrus.New(),
-		router: gin.Default(),
 	}
 }
 
@@ -29,11 +29,15 @@ func (s *Server) Start() error {
 		return err
 	}
 
-	if err := s.configureRouter(); err != nil {
+	if err := s.configureStore(); err != nil {
 		return err
 	}
 
-	if err := s.configureRedis(); err != nil {
+	if err := s.configurePool(); err != nil {
+		return err
+	}
+
+	if err := s.configureRouter(); err != nil {
 		return err
 	}
 
@@ -62,25 +66,40 @@ func (s *Server) configureLogger() error {
 	return nil
 }
 
-func (s *Server) configureRedis() error {
+func (s *Server) configureStore() error {
+	st := store.New(s.config.RedisConfig, s.logger)
 
-	opts, err := redis.ParseURL(s.config.RedisConfig.ConnectionString)
+	err := st.Start()
 	if err != nil {
 		return err
 	}
 
-	r := redis.NewClient(opts)
+	s.store = st
 
-	if err := r.Ping(context.Background()).Err(); err != nil {
-		return err
-	}
+	s.logger.Info("Store configured")
+	return nil
+}
 
-	s.logger.Info("Redis configured")
+func (s *Server) configurePool() error {
+	p := worker.NewPool(s.store, s.logger)
+	p.Start(10)
+	s.workers = p
 	return nil
 }
 
 func (s *Server) configureRouter() error {
-	r := router.New()
+
+	if s.workers == nil {
+		return errors.New("no workers configured")
+	}
+
+	if s.logger == nil {
+		return errors.New("no logger configured")
+	}
+
+	r := router.New(s.workers, s.logger)
+	r.Start()
+
 	s.router = r
 
 	s.logger.Info("Router configured")

@@ -21,14 +21,10 @@ services:
     ports:
       - "6379:6379"
     volumes:
-      - ./redis/data:/data
-      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./store/data:/data
+      - ./store/store.conf:/usr/local/etc/store/store.conf
     healthcheck:
-      test: [ "CMD", "redis-cli", "-a", "$REDIS_PASSWORD", "ping" ]
+      test: [ "CMD", "store-cli", "-a", "$REDIS_PASSWORD", "ping" ]
       interval: 30s
       timeout: 10s
       retries: 5
-
-networks:
-  adserver:
-    driver: bridge

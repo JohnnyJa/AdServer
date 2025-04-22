@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/BurntSushi/toml"
-	"github.com/JohnnyJa/AdServer/EventCollector/container/server"
+	"github.com/JohnnyJa/AdServer/EventCollector/internal/server"
 	"log"
 	"os"
 )
