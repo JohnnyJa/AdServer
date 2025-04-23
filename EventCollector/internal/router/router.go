@@ -1,10 +1,10 @@
 package router
 
 import (
+	"github.com/JohnnyJa/AdServer/EventCollector/internal/model"
 	"github.com/JohnnyJa/AdServer/EventCollector/internal/worker"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
-	"io"
 	"net/http"
 )
 
@@ -31,12 +31,12 @@ func (r *Router) Start() {
 	})
 
 	r.router.GET("/events", func(c *gin.Context) {
-		var bytes []byte
-		if c.Request.Body != nil {
-			bytes, _ = io.ReadAll(c.Request.Body)
+		var event model.Event
+		if err := c.BindJSON(&event); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{})
 		}
 
-		r.workers.Write(string(bytes))
+		r.workers.Write(event)
 		c.JSON(http.StatusOK, gin.H{})
 	})
 }
