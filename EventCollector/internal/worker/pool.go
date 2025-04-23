@@ -1,6 +1,8 @@
 package worker
 
 import (
+	"encoding/json"
+	"github.com/JohnnyJa/AdServer/EventCollector/internal/model"
 	"github.com/JohnnyJa/AdServer/EventCollector/internal/store"
 	"github.com/sirupsen/logrus"
 )
@@ -8,14 +10,14 @@ import (
 type Pool struct {
 	store  *store.Store
 	logger *logrus.Logger
-	ch     chan interface{}
+	ch     chan model.Event
 }
 
 func NewPool(store *store.Store, logger *logrus.Logger) *Pool {
 	return &Pool{
 		store:  store,
 		logger: logger,
-		ch:     make(chan interface{}),
+		ch:     make(chan model.Event),
 	}
 }
 
@@ -29,8 +31,14 @@ func (p *Pool) Start(n int) {
 	}()
 }
 
-func (p *Pool) write(data interface{}) {
-	err := p.store.Set("request", data)
+func (p *Pool) write(data model.Event) {
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		p.logger.Fatal("Cannot marshal event to json: %v", err)
+		return
+	}
+
+	err = p.store.Set("request", jsonData)
 	if err != nil {
 		p.logger.Errorf("Failed to store request: %v", err)
 		//TODO: Create recovery logic
@@ -42,6 +50,6 @@ func (p *Pool) Stop() error {
 	return nil
 }
 
-func (p *Pool) Write(data interface{}) {
+func (p *Pool) Write(data model.Event) {
 	p.ch <- data
 }
