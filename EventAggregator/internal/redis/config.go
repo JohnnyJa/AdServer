@@ -1,4 +1,4 @@
-package store
+package redis
 
 type Config struct {
 	ConnectionString string `toml:"connection_string"`

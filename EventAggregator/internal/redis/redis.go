@@ -1,25 +1,26 @@
-package store
+package redis
 
 import (
 	"context"
 	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
+	"time"
 )
 
-type Store struct {
+type Redis struct {
 	redis  *redis.Client
 	config *Config
 	logger *logrus.Logger
 }
 
-func New(config *Config, logger *logrus.Logger) *Store {
-	return &Store{
+func New(config *Config, logger *logrus.Logger) *Redis {
+	return &Redis{
 		config: config,
 		logger: logger,
 	}
 }
 
-func (s *Store) Start() error {
+func (s *Redis) Start() error {
 
 	opts, err := redis.ParseURL(s.config.ConnectionString)
 	if err != nil {
@@ -38,7 +39,7 @@ func (s *Store) Start() error {
 	return nil
 }
 
-func (s *Store) Stop() error {
+func (s *Redis) Stop() error {
 	err := s.redis.Close()
 	if err != nil {
 		return err
@@ -47,7 +48,7 @@ func (s *Store) Stop() error {
 	return nil
 }
 
-func (s *Store) Set(key string, value interface{}) error {
+func (s *Redis) Set(key string, value interface{}) error {
 	if err := s.redis.XAdd(context.Background(), &redis.XAddArgs{
 		Stream: key,
 		Values: map[string]interface{}{
@@ -59,9 +60,17 @@ func (s *Store) Set(key string, value interface{}) error {
 	return nil
 }
 
-func (s *Store) Ping() error {
+func (s *Redis) Ping() error {
 	if err := s.redis.Ping(context.Background()).Err(); err != nil {
 		return err
 	}
 	return nil
+}
+
+func (s *Redis) Read() ([]byte, error) {
+	res, err := s.redis.BLPop(context.Background(), time.Second*0, "request").Result()
+	if err != nil {
+		return nil, err
+	}
+	return []byte(res[1]), nil
 }

@@ -3,17 +3,17 @@ package worker
 import (
 	"encoding/json"
 	"github.com/JohnnyJa/AdServer/EventCollector/internal/model"
-	"github.com/JohnnyJa/AdServer/EventCollector/internal/store"
+	"github.com/JohnnyJa/AdServer/EventCollector/internal/redis"
 	"github.com/sirupsen/logrus"
 )
 
 type Pool struct {
-	store  *store.Store
+	store  *redis.Redis
 	logger *logrus.Logger
 	ch     chan model.Event
 }
 
-func NewPool(store *store.Store, logger *logrus.Logger) *Pool {
+func NewPool(store *redis.Redis, logger *logrus.Logger) *Pool {
 	return &Pool{
 		store:  store,
 		logger: logger,
@@ -40,7 +40,7 @@ func (p *Pool) write(data model.Event) {
 
 	err = p.store.Set("request", jsonData)
 	if err != nil {
-		p.logger.Errorf("Failed to store request: %v", err)
+		p.logger.Errorf("Failed to redis request: %v", err)
 		//TODO: Create recovery logic
 	}
 }

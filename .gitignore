@@ -106,5 +106,5 @@ fabric.properties
 
 .idea
 
-project/redis
+project/fs/volumes/redis
 
