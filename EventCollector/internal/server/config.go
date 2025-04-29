@@ -1,12 +1,12 @@
 package server
 
 import (
-	"github.com/JohnnyJa/AdServer/EventCollector/internal/store"
+	"github.com/JohnnyJa/AdServer/EventCollector/internal/redis"
 )
 
 type Config struct {
 	AppConfig   *AppConfig    `toml:"app"`
-	RedisConfig *store.Config `toml:"store"`
+	RedisConfig *redis.Config `toml:"redis"`
 }
 
 type AppConfig struct {
@@ -22,6 +22,6 @@ func NewConfig() *Config {
 			Port:     "",
 			LogLevel: "info",
 		},
-		RedisConfig: store.NewConfig(),
+		RedisConfig: redis.NewConfig(),
 	}
 }

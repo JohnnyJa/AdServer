@@ -2,8 +2,8 @@ package server
 
 import (
 	"errors"
+	"github.com/JohnnyJa/AdServer/EventCollector/internal/redis"
 	"github.com/JohnnyJa/AdServer/EventCollector/internal/router"
-	"github.com/JohnnyJa/AdServer/EventCollector/internal/store"
 	"github.com/JohnnyJa/AdServer/EventCollector/internal/worker"
 	"github.com/sirupsen/logrus"
 	"os"
@@ -13,7 +13,7 @@ type Server struct {
 	config  *Config
 	logger  *logrus.Logger
 	router  *router.Router
-	store   *store.Store
+	redis   *redis.Redis
 	workers *worker.Pool
 }
 
@@ -67,21 +67,21 @@ func (s *Server) configureLogger() error {
 }
 
 func (s *Server) configureStore() error {
-	st := store.New(s.config.RedisConfig, s.logger)
+	st := redis.New(s.config.RedisConfig, s.logger)
 
 	err := st.Start()
 	if err != nil {
 		return err
 	}
 
-	s.store = st
+	s.redis = st
 
-	s.logger.Info("Store configured")
+	s.logger.Info("Redis configured")
 	return nil
 }
 
 func (s *Server) configurePool() error {
-	p := worker.NewPool(s.store, s.logger)
+	p := worker.NewPool(s.redis, s.logger)
 	p.Start(10)
 	s.workers = p
 	return nil

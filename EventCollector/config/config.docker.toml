@@ -3,5 +3,5 @@ name = "EventCollector"
 port = ":80"
 log_level = "debug"
 
-[store]
+[redis]
 connection_string = "redis://redis:6379/0"
