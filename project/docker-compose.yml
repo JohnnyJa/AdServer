@@ -15,8 +15,6 @@ services:
       - eventCollector
 #      GIN_MODE: "release"
 
-
-
   redis:
     image: redis:latest
     container_name: redis_container
@@ -37,7 +35,7 @@ services:
     networks:
       - eventCollector
 
-# region druid
+# region pinot
   pinot-zookeeper:
     image: ${ZK_IMAGE:-zookeeper:3.9.2}
     container_name: "pinot-zookeeper"
@@ -78,7 +76,7 @@ services:
       retries: 5
       start_period: 10s
     deploy:
-      replicas: ${KAFKA_REPLICAS:-0}  # Default to 0, meaning Kafka won't start unless KAFKA_REPLICAS is set
+      replicas: ${KAFKA_REPLICAS:-1}  # Default to 0, meaning Kafka won't start unless KAFKA_REPLICAS is set
 
   pinot-controller:
     image: ${PINOT_IMAGE:-apachepinot/pinot:1.2.0}
@@ -142,7 +140,25 @@ services:
       timeout: 10s
       retries: 5
       start_period: 10s
-
+  pinot-up:
+    image: curlimages/curl:latest
+    container_name: pinot-up
+    entrypoint: >
+      /bin/sh -c "
+        echo 'Creating schema...';
+        curl -X POST -H 'Content-Type: application/json' -d @/tmp/schema.json http://pinot-controller:9000/schemas &&
+        echo 'Creating table...';
+        curl -X POST -H 'Content-Type: application/json' -d @/tmp/table_config.json http://pinot-controller:9000/tables"
+    volumes:
+      - ./fs/pinot/event-schema.json:/tmp/schema.json
+      - ./fs/pinot/events-table.json:/tmp/table_config.json
+    networks:
+      - pinot-demo
+    restart: "no"
+    depends_on:
+      - pinot-controller
+    environment:
+      JAVA_OPTS: "-Xms1G -Xmx2G"
 networks:
   druid:
     driver: bridge
