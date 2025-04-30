@@ -1,19 +1,19 @@
 services:
-#  event-collector:
-#    build:
-#      context: ${PWD}/../EventCollector
-#      dockerfile: ${PWD}/../EventCollector/Dockerfile
-#    restart: always
-#    ports:
-#      - "8080:80"
-#    environment:
-#      APP_ENV: docker
-#      APP_CONF_PATH: "/app/"
-#    depends_on:
-#      kafka:
-#        condition: service_healthy
-#    networks:
-#      - eventCollector
+  event-collector:
+    build:
+      context: ${PWD}/../EventCollector
+      dockerfile: ${PWD}/../EventCollector/Dockerfile
+    restart: always
+    ports:
+      - "80:80"
+    environment:
+      APP_ENV: docker
+      APP_CONF_PATH: "/app/"
+    depends_on:
+      kafka:
+        condition: service_healthy
+    networks:
+      - pinot-demo
 #      GIN_MODE: "release"
 
 #  redis:
@@ -55,20 +55,29 @@ services:
       retries: 5
       start_period: 10s
 
-  pinot-kafka:
+  kafka:
     image: ${KAFKA_IMAGE:-bitnami/kafka:3.6}
     container_name: "kafka"
     restart: unless-stopped
     ports:
-      - 29092:29092
+      - 9092:9092
     environment:
-      KAFKA_LISTENERS: EXTERNAL_SAME_HOST://:29092,INTERNAL://:9092
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,EXTERNAL_SAME_HOST://localhost:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL_SAME_HOST:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_ZOOKEEPER_CONNECT: pinot-zookeeper:2181/kafka
+      KAFKA_LISTENERS: INSIDE://:9093,OUTSIDE://:9092
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9093,OUTSIDE://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_LISTENER_NAME: INSIDE
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
       KAFKA_BROKER_ID: 0
-      KAFKA_ADVERTISED_HOST_NAME: kafka
+#      KAFKA_CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
+#      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+#      KAFKA_LISTENERS: EXTERNAL_SAME_HOST://:29092,INTERNAL://:9092
+#      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,EXTERNAL_SAME_HOST://localhost:29092
+#      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL_SAME_HOST:PLAINTEXT
+#      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+#      KAFKA_ZOOKEEPER_CONNECT: pinot-zookeeper:2181/kafka
+#      KAFKA_BROKER_ID: 0
+#      KAFKA_ADVERTISED_HOST_NAME: kafka
     depends_on:
       pinot-zookeeper:
         condition: service_healthy
@@ -161,7 +170,8 @@ services:
       - pinot-demo
     restart: "no"
     depends_on:
-      - pinot-controller
+      pinot-controller:
+        condition: service_healthy
     environment:
       JAVA_OPTS: "-Xms1G -Xmx2G"
 networks:

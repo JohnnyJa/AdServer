@@ -4,4 +4,4 @@ port = ":8080"
 log_level = "debug"
 
 [kafka]
-brokers = ["localhost:29092"]
+brokers = ["localhost:9092"]
