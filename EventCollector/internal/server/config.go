@@ -1,18 +1,22 @@
 package server
 
 import (
-	"github.com/JohnnyJa/AdServer/EventCollector/internal/redis"
+	"github.com/JohnnyJa/AdServer/EventCollector/internal/kafka"
 )
 
 type Config struct {
 	AppConfig   *AppConfig    `toml:"app"`
-	RedisConfig *redis.Config `toml:"redis"`
+	KafkaConfig *kafka.Config `toml:"kafka"`
 }
 
 type AppConfig struct {
 	Name     string `toml:"name"`
 	Port     string `toml:"port"`
 	LogLevel string `toml:"log_level"`
+}
+
+type ProducerConfig struct {
+	Brokers []string `toml:"brokers"`
 }
 
 func NewConfig() *Config {
@@ -22,6 +26,8 @@ func NewConfig() *Config {
 			Port:     "",
 			LogLevel: "info",
 		},
-		RedisConfig: redis.NewConfig(),
+		KafkaConfig: &kafka.Config{
+			Brokers: []string{"localhost:9092"},
+		},
 	}
 }

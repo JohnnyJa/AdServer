@@ -6,7 +6,7 @@ up:
 	docker compose up -d
 	@echo Docker Images started!
 
-up_build: build_event_collector build_event_aggregator
+up_build: build_event_collector 
 	@echo Stopping docker images \(if running...\)
 	docker compose down
 	@echo Building \(when requeired\) and starting docker images...

@@ -22,11 +22,11 @@
       "dataType": "STRING"
     },
     {
-      "name": "device_ip",
+      "name": "ip",
       "dataType": "STRING"
     },
     {
-      "name": "device_user_agent",
+      "name": "user_agent",
       "dataType": "STRING"
     },
     {

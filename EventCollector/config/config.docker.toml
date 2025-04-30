@@ -3,5 +3,5 @@ name = "EventCollector"
 port = ":80"
 log_level = "debug"
 
-[redis]
-connection_string = "redis://redis:6379/0"
+[kafka]
+brokers = ["kafka:9092"]

@@ -2,19 +2,17 @@ package server
 
 import (
 	"errors"
-	"github.com/JohnnyJa/AdServer/EventCollector/internal/redis"
+	"github.com/JohnnyJa/AdServer/EventCollector/internal/kafka"
 	"github.com/JohnnyJa/AdServer/EventCollector/internal/router"
-	"github.com/JohnnyJa/AdServer/EventCollector/internal/worker"
 	"github.com/sirupsen/logrus"
 	"os"
 )
 
 type Server struct {
-	config  *Config
-	logger  *logrus.Logger
-	router  *router.Router
-	redis   *redis.Redis
-	workers *worker.Pool
+	config *Config
+	logger *logrus.Logger
+	router router.Router
+	kafka  kafka.Kafka
 }
 
 func New(config *Config) *Server {
@@ -29,11 +27,7 @@ func (s *Server) Start() error {
 		return err
 	}
 
-	if err := s.configureStore(); err != nil {
-		return err
-	}
-
-	if err := s.configurePool(); err != nil {
+	if err := s.configureKafka(); err != nil {
 		return err
 	}
 
@@ -43,7 +37,7 @@ func (s *Server) Start() error {
 
 	s.logger.Info("Starting API Server")
 
-	if err := s.router.Run(s.config.AppConfig.Port); err != nil {
+	if err := s.router.Start(); err != nil {
 		return err
 	}
 	return nil
@@ -66,42 +60,45 @@ func (s *Server) configureLogger() error {
 	return nil
 }
 
-func (s *Server) configureStore() error {
-	st := redis.New(s.config.RedisConfig, s.logger)
-
-	err := st.Start()
-	if err != nil {
-		return err
-	}
-
-	s.redis = st
-
-	s.logger.Info("Redis configured")
-	return nil
-}
-
-func (s *Server) configurePool() error {
-	p := worker.NewPool(s.redis, s.logger)
-	p.Start(10)
-	s.workers = p
-	return nil
-}
-
 func (s *Server) configureRouter() error {
-
-	if s.workers == nil {
-		return errors.New("no workers configured")
-	}
 
 	if s.logger == nil {
 		return errors.New("no logger configured")
 	}
+	if s.kafka == nil {
+		return errors.New("no kafka configured")
+	}
 
-	r := router.New(s.workers, s.logger)
-	r.Start()
+	r := router.New(s.config.AppConfig.Port, s.logger, s.kafka)
+	err := r.ConfigureRoute()
+	if err != nil {
+		return err
+	}
+
+	err = r.Start()
+	if err != nil {
+		return err
+	}
 
 	s.router = r
 
 	s.logger.Info("Router configured")
+	return nil
+}
+
+func (s *Server) configureKafka() error {
+	if s.logger == nil {
+		return errors.New("no logger configured")
+	}
+
+	k := kafka.New(s.config.KafkaConfig, s.logger)
+	err := k.Start()
+	if err != nil {
+		return err
+	}
+
+	s.kafka = k
+
+	s.logger.Info("Kafka configured")
 	return nil
 }
