@@ -1,0 +1,53 @@
+{
+  "schemaName": "events",
+  "dimensionFieldSpecs": [
+    {
+      "name": "request_id",
+      "dataType": "STRING"
+    },
+    {
+      "name": "event_type",
+      "dataType": "INT"
+    },
+    {
+      "name": "profile_id",
+      "dataType": "INT"
+    },
+    {
+      "name": "publisher_id",
+      "dataType": "INT"
+    },
+    {
+      "name": "user_id",
+      "dataType": "STRING"
+    },
+    {
+      "name": "ip",
+      "dataType": "STRING"
+    },
+    {
+      "name": "user_agent",
+      "dataType": "STRING"
+    },
+    {
+      "name": "placement_id",
+      "dataType": "INT"
+    },
+    {
+      "name": "currency",
+      "dataType": "STRING"
+    }
+  ],
+  "metricFieldSpecs": [
+    {
+      "name": "bid_price",
+      "dataType": "DOUBLE"
+    }
+  ],
+  "dateTimeFieldSpecs": [{
+    "name": "ts",
+    "dataType": "TIMESTAMP",
+    "format" : "1:MILLISECONDS:EPOCH",
+    "granularity": "1:MILLISECONDS"
+  }]
+}
