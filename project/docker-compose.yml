@@ -13,7 +13,7 @@ services:
       kafka:
         condition: service_healthy
     networks:
-      - pinot-demo
+      - events-network
 #      GIN_MODE: "release"
 
 #  redis:
@@ -36,7 +36,36 @@ services:
 #    networks:
 #      - eventCollector
 
-# region pinot
+  postgres:
+    image: postgres:latest
+    restart: always
+    ports:
+      - "5432:5432"
+    user: postgres
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready"]
+      interval: 1s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - profile-data:/var/lib/postgresql/data
+      - ${PWD}/fs/postgres/init:/docker-entrypoint-initdb.d/
+
+  flyway:
+    image: flyway/flyway:latest
+    entrypoint: > 
+      sh -c "flyway -url=jdbc:postgresql://postgres:5432/profile_storage -user=${POSTGRES_USER} -password=${POSTGRES_PASSWORD} migrate"
+    volumes:
+      - ${PWD}/fs/postgres/migrations:/flyway/sql
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # region pinot
   pinot-zookeeper:
     image: ${ZK_IMAGE:-zookeeper:3.9.2}
     container_name: "pinot-zookeeper"
@@ -47,7 +76,7 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
     networks:
-      - pinot-demo
+      - events-network
     healthcheck:
       test: [ "CMD", "zkServer.sh", "status" ]
       interval: 30s
@@ -69,20 +98,11 @@ services:
       KAFKA_LISTENER_NAME: INSIDE
       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
       KAFKA_BROKER_ID: 0
-#      KAFKA_CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
-#      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-#      KAFKA_LISTENERS: EXTERNAL_SAME_HOST://:29092,INTERNAL://:9092
-#      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,EXTERNAL_SAME_HOST://localhost:29092
-#      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL_SAME_HOST:PLAINTEXT
-#      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
-#      KAFKA_ZOOKEEPER_CONNECT: pinot-zookeeper:2181/kafka
-#      KAFKA_BROKER_ID: 0
-#      KAFKA_ADVERTISED_HOST_NAME: kafka
     depends_on:
       pinot-zookeeper:
         condition: service_healthy
     networks:
-      - pinot-demo
+      - events-network
     healthcheck:
       test: [ "CMD-SHELL", "kafka-broker-api-versions.sh -bootstrap-server kafka:9092" ]
       interval: 30s
@@ -105,7 +125,7 @@ services:
       pinot-zookeeper:
         condition: service_healthy
     networks:
-      - pinot-demo
+      - events-network
     healthcheck:
       test: [ "CMD-SHELL", "curl -f http://localhost:9000/health || exit 1" ]
       interval: 30s
@@ -126,7 +146,7 @@ services:
       pinot-controller:
         condition: service_healthy
     networks:
-      - pinot-demo
+      - events-network
     healthcheck:
       test: [ "CMD-SHELL", "curl -f http://localhost:8099/health || exit 1" ]
       interval: 30s
@@ -147,7 +167,7 @@ services:
       pinot-broker:
         condition: service_healthy
     networks:
-      - pinot-demo
+      - events-network
     healthcheck:
       test: [ "CMD-SHELL", "curl -f http://localhost:8097/health/readiness || exit 1" ]
       interval: 30s
@@ -167,18 +187,22 @@ services:
       - ./fs/pinot/event-schema.json:/tmp/schema.json
       - ./fs/pinot/events-table.json:/tmp/table_config.json
     networks:
-      - pinot-demo
+      - events-network
     restart: "no"
     depends_on:
       pinot-controller:
         condition: service_healthy
     environment:
       JAVA_OPTS: "-Xms1G -Xmx2G"
+
 networks:
   druid:
     driver: bridge
   eventCollector:
     driver: bridge
-  pinot-demo:
-    name: pinot-demo
+  events-network:
+    name: events-network
     driver: bridge
+
+volumes:
+  profile-data:
