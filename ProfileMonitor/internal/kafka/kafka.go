@@ -3,14 +3,28 @@ package kafka
 import (
 	"encoding/json"
 	"github.com/IBM/sarama"
-	"github.com/JohnnyJa/AdServer/EventCollector/internal/model"
-	"github.com/JohnnyJa/AdServer/EventCollector/service"
+	"github.com/JohnnyJa/AdServer/ProfileMonitor/service"
 	"github.com/sirupsen/logrus"
 )
 
+type ProfileForKafka struct {
+	ID        string             `json:"id"`
+	Name      string             `json:"name"`
+	Creatives []CreativeForKafka `json:"creatives"`
+}
+
+type CreativeForKafka struct {
+	ID           string            `json:"id"`
+	MediaURL     string            `json:"media_url"`
+	Width        int               `json:"width"`
+	Height       int               `json:"height"`
+	CreativeType string            `json:"creative_type"`
+	Targeting    map[string]string `json:"targeting"`
+}
+
 type Kafka interface {
 	service.Service
-	Write(event model.Event) error
+	Write(forKafka []ProfileForKafka) error
 }
 
 type kafka struct {
@@ -46,8 +60,8 @@ func (k *kafka) Stop() error {
 	return nil
 }
 
-func (k *kafka) Write(event model.Event) error {
-	bytes, err := json.Marshal(event)
+func (k *kafka) Write(forKafka []ProfileForKafka) error {
+	bytes, err := json.Marshal(forKafka)
 	if err != nil {
 		return err
 	}
