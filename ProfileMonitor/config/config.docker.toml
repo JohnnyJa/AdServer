@@ -1,0 +1,14 @@
+[app]
+name = "ProfileMonitor"
+port = ":80"
+log_level = "debug"
+
+[kafka]
+brokers = ["kafka:9093"]
+topic = "profile-indexer.active-profiles"
+
+[postgres]
+connection_string = "postgres://postgres:1@postgres:5432/profile_storage"
+
+[worker]
+delay = "5s"
