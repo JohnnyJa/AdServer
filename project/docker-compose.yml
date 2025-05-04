@@ -75,15 +75,29 @@ services:
     networks:
       - profile-service
 
-  flyway:
+  flyway-profile-storage:
     image: flyway/flyway:latest
     entrypoint: > 
       sh -c "flyway -url=jdbc:postgresql://postgres:5432/profile_storage -user=${POSTGRES_USER} -password=${POSTGRES_PASSWORD} migrate"
     volumes:
-      - ${PWD}/fs/postgres/migrations:/flyway/sql
+      - ${PWD}/fs/postgres/profile_storage:/flyway/sql
     depends_on:
       postgres:
         condition: service_healthy
+    networks:
+      - profile-service
+
+  flyway-package-storage:
+    image: flyway/flyway:latest
+    entrypoint: >
+      sh -c "flyway -url=jdbc:postgresql://postgres:5432/package_storage -user=${POSTGRES_USER} -password=${POSTGRES_PASSWORD} migrate"
+    volumes:
+      - ${PWD}/fs/postgres/package_storage:/flyway/sql
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - profile-service
 
   # region pinot
   pinot-zookeeper:
