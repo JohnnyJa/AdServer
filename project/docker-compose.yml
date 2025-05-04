@@ -5,7 +5,7 @@ services:
       dockerfile: ${PWD}/../EventCollector/Dockerfile
     restart: always
     ports:
-      - "80:80"
+      - "8080:80"
     environment:
       APP_ENV: docker
       APP_CONF_PATH: "/app/"
@@ -98,6 +98,7 @@ services:
       KAFKA_LISTENER_NAME: INSIDE
       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
       KAFKA_BROKER_ID: 0
+      KAFKA_CREATE_TOPICS: event-collector.events:3:1,profile-indexer.active-profiles:3:1
     depends_on:
       pinot-zookeeper:
         condition: service_healthy
