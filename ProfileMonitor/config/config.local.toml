@@ -1,6 +1,6 @@
 [app]
 name = "ProfileMonitor"
-port = ":8081"
+port = "8081"
 log_level = "debug"
 
 [kafka]
