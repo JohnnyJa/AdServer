@@ -33,6 +33,22 @@ services:
     networks:
       - profile-service
 
+  package-service:
+    build:
+      context: ${PWD}/../PackageService
+      dockerfile: ${PWD}/../PackageService/Dockerfile
+    restart: always
+    ports:
+      - "8082:80"
+    environment:
+      APP_ENV: docker
+      APP_CONF_PATH: "/app/"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - package-service
+
 
 #  redis:
 #    image: redis:latest
@@ -74,16 +90,31 @@ services:
       - ${PWD}/fs/postgres/init:/docker-entrypoint-initdb.d/
     networks:
       - profile-service
+      - package-service
 
-  flyway:
+  flyway-profile-storage:
     image: flyway/flyway:latest
     entrypoint: > 
       sh -c "flyway -url=jdbc:postgresql://postgres:5432/profile_storage -user=${POSTGRES_USER} -password=${POSTGRES_PASSWORD} migrate"
     volumes:
-      - ${PWD}/fs/postgres/migrations:/flyway/sql
+      - ${PWD}/fs/postgres/profile_storage:/flyway/sql
     depends_on:
       postgres:
         condition: service_healthy
+    networks:
+      - profile-service
+
+  flyway-package-storage:
+    image: flyway/flyway:latest
+    entrypoint: >
+      sh -c "flyway -url=jdbc:postgresql://postgres:5432/package_storage -user=${POSTGRES_USER} -password=${POSTGRES_PASSWORD} migrate"
+    volumes:
+      - ${PWD}/fs/postgres/package_storage:/flyway/sql
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - profile-service
 
   # region pinot
   pinot-zookeeper:
@@ -226,6 +257,8 @@ networks:
     name: events-network
     driver: bridge
   profile-service:
+    driver: bridge
+  package-service:
     driver: bridge
 
 volumes:

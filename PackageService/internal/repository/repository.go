@@ -3,14 +3,16 @@ package repository
 import (
 	"context"
 	"fmt"
-	"github.com/JohnnyJa/AdServer/ProfileMonitor/service"
+	"github.com/JohnnyJa/AdServer/PackageService/internal/model"
+	"github.com/JohnnyJa/AdServer/PackageService/service"
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/sirupsen/logrus"
 )
 
 type Repository interface {
 	service.Service
-	ReadProfiles(ctx context.Context) ([]ProfileRow, error)
+	ReadPackages(ctx context.Context, packageIds []uuid.UUID) ([]model.Package, error)
 }
 
 type repository struct {
@@ -26,35 +28,27 @@ func New(config *Config, logger *logrus.Logger) Repository {
 	}
 }
 
-func (r *repository) ReadProfiles(ctx context.Context) ([]ProfileRow, error) {
-	rows, err := r.db.Query(ctx, `
-		SELECT
-    		profile_id, profile_name,
-		    creative_id, media_url, width, height, creative_type,
-    		key, value,
-    		package_ids
-		FROM active_profile_view p
-`)
-
+func (r *repository) ReadPackages(ctx context.Context, packageIds []uuid.UUID) ([]model.Package, error) {
+	query := `
+		SELECT p.id, p.name, array_agg(pz.zone_id) as zone_ids
+		FROM package p
+		LEFT JOIN package_zone pz ON p.id = pz.package_id
+		WHERE p.id = ANY($1)
+		GROUP BY p.id
+	`
+	rows, err := r.db.Query(ctx, query, packageIds)
 	if err != nil {
-		return nil, fmt.Errorf("query active_profile_view: %w", err)
+		return nil, err
 	}
 	defer rows.Close()
 
-	var result []ProfileRow
+	var result []model.Package
 	for rows.Next() {
-		var r ProfileRow
+		var r model.Package
 		err := rows.Scan(
-			&r.ProfileID,
-			&r.ProfileName,
-			&r.CreativeID,
-			&r.MediaURL,
-			&r.Width,
-			&r.Height,
-			&r.CreativeType,
-			&r.TargetingKey,
-			&r.TargetingValue,
-			&r.PackageIDs,
+			&r.Id,
+			&r.Name,
+			&r.ZoneIds,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("scan active_profile_view: %w", err)

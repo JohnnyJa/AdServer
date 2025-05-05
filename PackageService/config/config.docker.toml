@@ -1,0 +1,8 @@
+[app]
+name = "PackageService"
+port = "80"
+log_level = "debug"
+
+[postgres]
+connection_string = "postgres://postgres:1@postgres:5432/package_storage"
+
