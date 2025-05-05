@@ -1,0 +1,7 @@
+[app]
+name = "EventCollector"
+port = ":80"
+log_level = "debug"
+
+[kafka]
+brokers = ["kafka:9093"]
