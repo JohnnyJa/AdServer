@@ -1,6 +1,6 @@
 [app]
-name = "EventCollector"
-port = "8084"
+name = "PackageService"
+port = "8082"
 log_level = "debug"
 
 [postgres]

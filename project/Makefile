@@ -1,12 +1,13 @@
 EVENT_COLLECTOR=eventCollector
 PROFILE_MONITOR=profileMonitor
+PACKAGE_SERVICE=packageService
 
 up:
 	@echo Starting Docker images...
 	docker compose up -d
 	@echo Docker Images started!
 
-up_build: build_event_collector build_profile_monitor
+up_build: build_event_collector build_profile_monitor build_package_service
 	@echo Stopping docker images \(if running...\)
 	docker compose down
 	@echo Building \(when requeired\) and starting docker images...
@@ -26,4 +27,9 @@ build_event_collector:
 build_profile_monitor:
 	@echo Building profileMonitor binary
 	chdir ../ProfileMonitor && set GOOS=linux && set GOARCH=amd64 && CGO_ENABLED=0 && go build -o ${PROFILE_MONITOR} ./cmd/api
+	@echo Done!
+
+build_package_service:
+	@echo Building profileMonitor binary
+	chdir ../PackageService && set GOOS=linux && set GOARCH=amd64 && CGO_ENABLED=0 && go build -o ${PACKAGE_SERVICE} ./cmd/api
 	@echo Done!

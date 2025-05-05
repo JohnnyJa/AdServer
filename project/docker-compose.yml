@@ -33,6 +33,22 @@ services:
     networks:
       - profile-service
 
+  package-service:
+    build:
+      context: ${PWD}/../PackageService
+      dockerfile: ${PWD}/../PackageService/Dockerfile
+    restart: always
+    ports:
+      - "8082:80"
+    environment:
+      APP_ENV: docker
+      APP_CONF_PATH: "/app/"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - package-service
+
 
 #  redis:
 #    image: redis:latest
@@ -74,6 +90,7 @@ services:
       - ${PWD}/fs/postgres/init:/docker-entrypoint-initdb.d/
     networks:
       - profile-service
+      - package-service
 
   flyway-profile-storage:
     image: flyway/flyway:latest
@@ -240,6 +257,8 @@ networks:
     name: events-network
     driver: bridge
   profile-service:
+    driver: bridge
+  package-service:
     driver: bridge
 
 volumes:
