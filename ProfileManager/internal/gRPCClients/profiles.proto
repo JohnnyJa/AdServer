@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package profiles;
+
+option go_package = "/proto";
+
+service ProfilesService{
+  rpc GetActiveProfiles (GetProfilesRequest) returns (GetProfilesResponse);
+}
+
+message GetProfilesRequest{}
+
+message Creative {
+  string id = 1;
+  string media_url = 2;
+  int32 width = 3;
+  int32 height = 4;
+  string creative_type = 5;
+  map<string, string> creative_targeting = 6;
+}
+
+message Profile {
+  string id = 1;
+  string name = 2;
+  map<string, Creative> creatives = 3; // map[uuid]string -> Creative
+  repeated string package_ids = 4;     // UUIDs як рядки
+}
+
+message GetProfilesResponse {
+  repeated Profile profiles = 1;
+}

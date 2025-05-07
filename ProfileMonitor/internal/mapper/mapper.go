@@ -1,6 +1,7 @@
 package mapper
 
 import (
+	"github.com/JohnnyJa/AdServer/ProfileMonitor/internal/gRPC/proto"
 	"github.com/JohnnyJa/AdServer/ProfileMonitor/internal/kafka"
 	"github.com/JohnnyJa/AdServer/ProfileMonitor/internal/model"
 	"github.com/JohnnyJa/AdServer/ProfileMonitor/internal/repository"
@@ -41,6 +42,36 @@ func ToProfiles(rows []repository.ProfileRow) (map[uuid.UUID]*model.Profile, err
 
 	}
 	return profiles, nil
+}
+
+func ToGrpcProfiles(p map[uuid.UUID]*model.Profile) *proto.GetProfilesResponse {
+	resp := &proto.GetProfilesResponse{}
+	for _, p := range p {
+		var packageIds []string
+		for _, pkg := range p.PackageIDs {
+			packageIds = append(packageIds, pkg.String())
+		}
+
+		creatives := make(map[string]*proto.Creative)
+		for _, creative := range p.Creatives {
+			creatives[creative.ID.String()] = &proto.Creative{
+				Id:                creative.ID.String(),
+				MediaUrl:          creative.MediaURL,
+				Width:             int32(creative.Width),
+				Height:            int32(creative.Height),
+				CreativeType:      creative.CreativeType,
+				CreativeTargeting: creative.CreativeTargeting,
+			}
+		}
+
+		resp.Profiles = append(resp.Profiles, &proto.Profile{
+			Id:         p.Id.String(),
+			Name:       p.Name,
+			PackageIds: packageIds,
+			Creatives:  creatives,
+		})
+	}
+	return resp
 }
 
 func ToKafkaProfile(p model.Profile) kafka.ProfileForKafka {

@@ -2,21 +2,23 @@ package server
 
 import (
 	"errors"
+	"github.com/JohnnyJa/AdServer/ProfileMonitor/internal/gRPC"
 	"github.com/JohnnyJa/AdServer/ProfileMonitor/internal/kafka"
 	"github.com/JohnnyJa/AdServer/ProfileMonitor/internal/repository"
 	"github.com/JohnnyJa/AdServer/ProfileMonitor/internal/worker"
 	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc"
+	"net"
 	"os"
-	"os/signal"
-	"syscall"
 )
 
 type Server struct {
-	config *Config
-	logger *logrus.Logger
-	repo   repository.Repository
-	kafka  kafka.Kafka
-	worker worker.Worker
+	config     *Config
+	logger     *logrus.Logger
+	repo       repository.Repository
+	grpcServer *grpc.Server
+	kafka      kafka.Kafka
+	worker     worker.Worker
 }
 
 func New(config *Config) *Server {
@@ -31,29 +33,22 @@ func (s *Server) Start() error {
 		return err
 	}
 
-	if err := s.configureKafka(); err != nil {
-		return err
-	}
+	//if err := s.configureKafka(); err != nil {
+	//	return err
+	//}
 
 	if err := s.configureRepository(); err != nil {
 		return err
 	}
 
-	if err := s.configureWorker(); err != nil {
+	if err := s.startGRPCServer(); err != nil {
 		return err
 	}
 
-	s.logger.Info("Starting Server")
+	//if err := s.configureWorker(); err != nil {
+	//	return err
+	//}
 
-	// Канал для прийому OS-сигналів
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-
-	// Блокуємось, поки не прийде сигнал
-	<-quit
-
-	s.logger.Info("Shutting down Server")
-	// Тут можеш додати логіку graceful shutdown (наприклад, s.worker.Stop())
 	return nil
 }
 
@@ -129,5 +124,28 @@ func (s *Server) configureWorker() error {
 
 	s.worker = w
 	s.logger.Info("Worker configured")
+	return nil
+}
+
+func (s *Server) startGRPCServer() error {
+	if s.repo == nil {
+		return errors.New("no repository configured")
+	}
+
+	l, err := net.Listen("tcp", ":"+s.config.AppConfig.Port)
+	if err != nil {
+		s.logger.Fatal(err)
+	}
+
+	grpcServer := grpc.NewServer()
+	gRPC.Register(grpcServer, s.repo, s.logger)
+	s.logger.Info("Starting gRPCClients Server on port %s", s.config.AppConfig.Port)
+
+	s.grpcServer = grpcServer
+
+	if err := grpcServer.Serve(l); err != nil {
+		return err
+	}
+
 	return nil
 }

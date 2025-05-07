@@ -32,6 +32,7 @@ services:
         condition: service_healthy
     networks:
       - profile-service
+      - profile-manager
 
   package-service:
     build:
@@ -48,6 +49,24 @@ services:
         condition: service_healthy
     networks:
       - package-service
+      - profile-manager
+
+  profile-manager:
+    build:
+      context:  ${PWD}/../ProfileManager
+      dockerfile: ${PWD}/../ProfileManager/Dockerfile
+    restart: always
+    ports:
+      - "8083:80"
+    environment:
+      APP_ENV: docker
+      APP_CONF_PATH: "/app/"
+    depends_on:
+      - package-service
+      - profile-monitor
+    networks:
+      - profile-manager
+
 
 
 #  redis:
@@ -259,6 +278,8 @@ networks:
   profile-service:
     driver: bridge
   package-service:
+    driver: bridge
+  profile-manager:
     driver: bridge
 
 volumes:

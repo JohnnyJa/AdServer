@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "./proto";
+
+service PackageService {
+rpc GetPackagesWithZones (GetPackagesWithZonesRequest) returns (GetPackagesWithZonesResponse);
+}
+
+message GetPackagesWithZonesRequest {
+repeated string package_ids = 1;
+}
+
+message GetPackagesWithZonesResponse {
+repeated Package packages = 1;
+}
+
+message Package {
+string id = 1;
+string name = 2;
+repeated string zone_ids = 3;
+}
+
