@@ -1,0 +1,15 @@
+[app]
+name = "ProfileManager"
+port = "80"
+log_level = "debug"
+
+[profile]
+address = "profile-monitor:80"
+timeout = "5ms"
+
+[package]
+address = "package-service:80"
+timeout = "5ms"
+
+[storage]
+interval = "5s"
