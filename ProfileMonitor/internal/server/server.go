@@ -139,7 +139,7 @@ func (s *Server) startGRPCServer() error {
 
 	grpcServer := grpc.NewServer()
 	gRPC.Register(grpcServer, s.repo, s.logger)
-	s.logger.Info("Starting gRPC Server on port %s", s.config.AppConfig.Port)
+	s.logger.Info("Starting gRPCClients Server on port %s", s.config.AppConfig.Port)
 
 	s.grpcServer = grpcServer
 

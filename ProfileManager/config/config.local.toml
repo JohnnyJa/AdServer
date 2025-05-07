@@ -1,0 +1,15 @@
+[app]
+name = "ProfileManager"
+port = "8083"
+log_level = "debug"
+
+[profile]
+address = "localhost:8081"
+timeout = "5ms"
+
+[package]
+address = "localhost:8082"
+timeout = "5ms"
+
+[storage]
+interval = "5s"

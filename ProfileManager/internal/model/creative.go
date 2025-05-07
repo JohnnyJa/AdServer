@@ -5,8 +5,8 @@ import "github.com/google/uuid"
 type Creative struct {
 	ID                uuid.UUID
 	MediaURL          string
-	Width             int
-	Height            int
+	Width             int32
+	Height            int32
 	CreativeType      string
 	CreativeTargeting map[string]string
 }

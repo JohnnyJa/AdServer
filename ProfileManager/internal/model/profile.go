@@ -5,8 +5,7 @@ import (
 )
 
 type Profile struct {
-	Id         uuid.UUID
-	Name       string
-	Creatives  map[uuid.UUID]*Creative
-	PackageIDs []uuid.UUID
+	Id        uuid.UUID
+	Name      string
+	Creatives map[uuid.UUID]*Creative
 }

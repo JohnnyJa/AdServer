@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "./proto";
+
+service ProfilesByZoneService {
+  rpc GetProfilesByZone (GetProfileByZoneRequest) returns (GetProfilesByZoneResponse);
+}
+
+message GetProfileByZoneRequest {
+  string zone_id = 1;
+}
+
+message GetProfilesByZoneResponse {
+  map <string, ProfileIds> profilesByPackage = 1;
+  map <string, Profile> profilesByUUID = 2;
+}
+
+message ProfileIds {
+  repeated string Ids = 1;
+}
+
+
+message Profile {
+  string id = 1;
+  string name = 2;
+  map<string, Creative> creatives = 3;
+}
+
+message Creative {
+  string id = 1;
+  string mediaURL = 2;
+  int32 width = 3;
+  int32 height = 4;
+  string creativeType = 5;
+  map<string, string> creativeTargeting = 6;
+}

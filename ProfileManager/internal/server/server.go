@@ -2,7 +2,9 @@ package server
 
 import (
 	"errors"
-	"github.com/JohnnyJa/AdServer/ProfileManager/internal/kafka"
+	"github.com/JohnnyJa/AdServer/ProfileManager/internal/gRPCClients"
+	"github.com/JohnnyJa/AdServer/ProfileManager/internal/gRPCServer"
+	"github.com/JohnnyJa/AdServer/ProfileManager/internal/profileStorage"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"net"
@@ -10,10 +12,12 @@ import (
 )
 
 type Server struct {
-	config     *Config
-	logger     *logrus.Logger
-	kafka      kafka.Kafka
-	grpcServer *grpc.Server
+	config        *Config
+	logger        *logrus.Logger
+	profileClient gRPCClients.ProfileClient
+	packageClient gRPCClients.PackageClient
+	grpcServer    *grpc.Server
+	storage       profileStorage.ProfileStorage
 }
 
 func New(config *Config) *Server {
@@ -28,7 +32,11 @@ func (s *Server) Start() error {
 		return err
 	}
 
-	if err := s.configureKafka(); err != nil {
+	if err := s.configureClients(); err != nil {
+		return err
+	}
+
+	if err := s.configureStorage(); err != nil {
 		return err
 	}
 
@@ -58,26 +66,32 @@ func (s *Server) configureLogger() error {
 	return nil
 }
 
-func (s *Server) configureKafka() error {
-	if s.logger == nil {
-		return errors.New("no logger configured")
+func (s *Server) configureStorage() error {
+	if s.packageClient == nil {
+		return errors.New("no package client configured")
 	}
 
-	k := kafka.New(s.config.KafkaConfig, s.logger)
-	err := k.Start()
+	if s.profileClient == nil {
+		return errors.New("no profile client configured")
+	}
+
+	storage := profileStorage.New(s.config.StorageConfig, s.logger, s.profileClient, s.packageClient)
+
+	err := storage.Start()
 	if err != nil {
 		return err
 	}
 
-	s.kafka = k
+	s.storage = storage
 
-	s.logger.Info("Kafka configured")
+	s.logger.Info("Storage configured")
+
 	return nil
 }
 
 func (s *Server) startGRPCServer() error {
-	if s.repo == nil {
-		return errors.New("no repository configured")
+	if s.storage == nil {
+		return errors.New("no storage configured")
 	}
 
 	l, err := net.Listen("tcp", ":"+s.config.AppConfig.Port)
@@ -86,8 +100,8 @@ func (s *Server) startGRPCServer() error {
 	}
 
 	grpcServer := grpc.NewServer()
-	gRPC.Register(grpcServer, s.repo, s.logger)
-	s.logger.Info("Starting gRPC Server on port %s", s.config.AppConfig.Port)
+	gRPCServer.Register(grpcServer, s.storage, s.logger)
+	s.logger.Info("Starting gRPCClients Server on port %s", s.config.AppConfig.Port)
 
 	s.grpcServer = grpcServer
 
@@ -101,4 +115,40 @@ func (s *Server) startGRPCServer() error {
 func (s *Server) Stop() error {
 	s.grpcServer.GracefulStop()
 	return nil
+}
+
+func (s *Server) configureClients() error {
+	var err error
+	s.profileClient, err = s.configureProfileClient()
+	if err != nil {
+		return err
+	}
+	s.logger.Info("Configured profile client")
+
+	s.packageClient, err = s.configurePackageClient()
+	if err != nil {
+		return err
+	}
+	s.logger.Info("Configured package client")
+	return nil
+}
+
+func (s *Server) configureProfileClient() (gRPCClients.ProfileClient, error) {
+	cl := gRPCClients.NewProfileClient(s.config.ProfileClientConfig)
+	err := cl.Start()
+	if err != nil {
+		return nil, err
+	}
+
+	return cl, nil
+}
+
+func (s *Server) configurePackageClient() (gRPCClients.PackageClient, error) {
+	cl := gRPCClients.NewPackageClient(s.config.PackageClientConfig)
+	err := cl.Start()
+	if err != nil {
+		return nil, err
+	}
+
+	return cl, nil
 }

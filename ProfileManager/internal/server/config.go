@@ -1,12 +1,15 @@
 package server
 
 import (
-	"github.com/JohnnyJa/AdServer/ProfileManager/internal/kafka"
+	"github.com/JohnnyJa/AdServer/ProfileManager/internal/gRPCClients"
+	"github.com/JohnnyJa/AdServer/ProfileManager/internal/profileStorage"
 )
 
 type Config struct {
-	AppConfig   *AppConfig    `toml:"app"`
-	KafkaConfig *kafka.Config `toml:"kafka"`
+	AppConfig           *AppConfig             `toml:"app"`
+	ProfileClientConfig *gRPCClients.Config    `toml:"profile"`
+	PackageClientConfig *gRPCClients.Config    `toml:"package"`
+	StorageConfig       *profileStorage.Config `toml:"storage"`
 }
 
 type AppConfig struct {
