@@ -29,7 +29,7 @@ func New(config *Config, logger *logrus.Logger) Repository {
 func (r *repository) ReadProfiles(ctx context.Context) ([]ProfileRow, error) {
 	rows, err := r.db.Query(ctx, `
 		SELECT
-    		profile_id, profile_name,
+    		profile_id, profile_name, bid_price,
 		    creative_id, media_url, width, height, creative_type,
     		key, value,
     		package_ids
@@ -47,6 +47,7 @@ func (r *repository) ReadProfiles(ctx context.Context) ([]ProfileRow, error) {
 		err := rows.Scan(
 			&r.ProfileID,
 			&r.ProfileName,
+			&r.BidPrice,
 			&r.CreativeID,
 			&r.MediaURL,
 			&r.Width,

@@ -1,0 +1,8 @@
+name = "BidHandler"
+log_level = "debug"
+
+[profiles]
+address = "localhost:8083"
+
+[server]
+port = "8084"

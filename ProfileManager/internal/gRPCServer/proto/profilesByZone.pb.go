@@ -162,12 +162,14 @@ func (x *ProfileIds) GetIds() []string {
 }
 
 type Profile struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Creatives     map[string]*Creative   `protobuf:"bytes,3,rep,name=creatives,proto3" json:"creatives,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Id                string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name              string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	BidPrice          float32                `protobuf:"fixed32,3,opt,name=bidPrice,proto3" json:"bidPrice,omitempty"`
+	Creatives         map[string]*Creative   `protobuf:"bytes,4,rep,name=creatives,proto3" json:"creatives,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	ProfilesTargeting map[string]string      `protobuf:"bytes,5,rep,name=profilesTargeting,proto3" json:"profilesTargeting,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *Profile) Reset() {
@@ -214,6 +216,13 @@ func (x *Profile) GetName() string {
 	return ""
 }
 
+func (x *Profile) GetBidPrice() float32 {
+	if x != nil {
+		return x.BidPrice
+	}
+	return 0
+}
+
 func (x *Profile) GetCreatives() map[string]*Creative {
 	if x != nil {
 		return x.Creatives
@@ -221,16 +230,22 @@ func (x *Profile) GetCreatives() map[string]*Creative {
 	return nil
 }
 
+func (x *Profile) GetProfilesTargeting() map[string]string {
+	if x != nil {
+		return x.ProfilesTargeting
+	}
+	return nil
+}
+
 type Creative struct {
-	state             protoimpl.MessageState `protogen:"open.v1"`
-	Id                string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	MediaURL          string                 `protobuf:"bytes,2,opt,name=mediaURL,proto3" json:"mediaURL,omitempty"`
-	Width             int32                  `protobuf:"varint,3,opt,name=width,proto3" json:"width,omitempty"`
-	Height            int32                  `protobuf:"varint,4,opt,name=height,proto3" json:"height,omitempty"`
-	CreativeType      string                 `protobuf:"bytes,5,opt,name=creativeType,proto3" json:"creativeType,omitempty"`
-	CreativeTargeting map[string]string      `protobuf:"bytes,6,rep,name=creativeTargeting,proto3" json:"creativeTargeting,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	MediaURL      string                 `protobuf:"bytes,2,opt,name=mediaURL,proto3" json:"mediaURL,omitempty"`
+	Width         int32                  `protobuf:"varint,3,opt,name=width,proto3" json:"width,omitempty"`
+	Height        int32                  `protobuf:"varint,4,opt,name=height,proto3" json:"height,omitempty"`
+	CreativeType  string                 `protobuf:"bytes,5,opt,name=creativeType,proto3" json:"creativeType,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Creative) Reset() {
@@ -298,13 +313,6 @@ func (x *Creative) GetCreativeType() string {
 	return ""
 }
 
-func (x *Creative) GetCreativeTargeting() map[string]string {
-	if x != nil {
-		return x.CreativeTargeting
-	}
-	return nil
-}
-
 var File_profilesByZone_proto protoreflect.FileDescriptor
 
 const file_profilesByZone_proto_rawDesc = "" +
@@ -323,24 +331,25 @@ const file_profilesByZone_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\v2\v.pb.ProfileR\x05value:\x028\x01\"\x1e\n" +
 	"\n" +
 	"ProfileIds\x12\x10\n" +
-	"\x03Ids\x18\x01 \x03(\tR\x03Ids\"\xb3\x01\n" +
+	"\x03Ids\x18\x01 \x03(\tR\x03Ids\"\xe7\x02\n" +
 	"\aProfile\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x128\n" +
-	"\tcreatives\x18\x03 \x03(\v2\x1a.pb.Profile.CreativesEntryR\tcreatives\x1aJ\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1a\n" +
+	"\bbidPrice\x18\x03 \x01(\x02R\bbidPrice\x128\n" +
+	"\tcreatives\x18\x04 \x03(\v2\x1a.pb.Profile.CreativesEntryR\tcreatives\x12P\n" +
+	"\x11profilesTargeting\x18\x05 \x03(\v2\".pb.Profile.ProfilesTargetingEntryR\x11profilesTargeting\x1aJ\n" +
 	"\x0eCreativesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\"\n" +
-	"\x05value\x18\x02 \x01(\v2\f.pb.CreativeR\x05value:\x028\x01\"\xa1\x02\n" +
+	"\x05value\x18\x02 \x01(\v2\f.pb.CreativeR\x05value:\x028\x01\x1aD\n" +
+	"\x16ProfilesTargetingEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x88\x01\n" +
 	"\bCreative\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
 	"\bmediaURL\x18\x02 \x01(\tR\bmediaURL\x12\x14\n" +
 	"\x05width\x18\x03 \x01(\x05R\x05width\x12\x16\n" +
 	"\x06height\x18\x04 \x01(\x05R\x06height\x12\"\n" +
-	"\fcreativeType\x18\x05 \x01(\tR\fcreativeType\x12Q\n" +
-	"\x11creativeTargeting\x18\x06 \x03(\v2#.pb.Creative.CreativeTargetingEntryR\x11creativeTargeting\x1aD\n" +
-	"\x16CreativeTargetingEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x012h\n" +
+	"\fcreativeType\x18\x05 \x01(\tR\fcreativeType2h\n" +
 	"\x15ProfilesByZoneService\x12O\n" +
 	"\x11GetProfilesByZone\x12\x1b.pb.GetProfileByZoneRequest\x1a\x1d.pb.GetProfilesByZoneResponseB\tZ\a./protob\x06proto3"
 
@@ -366,13 +375,13 @@ var file_profilesByZone_proto_goTypes = []any{
 	nil,                               // 5: pb.GetProfilesByZoneResponse.ProfilesByPackageEntry
 	nil,                               // 6: pb.GetProfilesByZoneResponse.ProfilesByUUIDEntry
 	nil,                               // 7: pb.Profile.CreativesEntry
-	nil,                               // 8: pb.Creative.CreativeTargetingEntry
+	nil,                               // 8: pb.Profile.ProfilesTargetingEntry
 }
 var file_profilesByZone_proto_depIdxs = []int32{
 	5, // 0: pb.GetProfilesByZoneResponse.profilesByPackage:type_name -> pb.GetProfilesByZoneResponse.ProfilesByPackageEntry
 	6, // 1: pb.GetProfilesByZoneResponse.profilesByUUID:type_name -> pb.GetProfilesByZoneResponse.ProfilesByUUIDEntry
 	7, // 2: pb.Profile.creatives:type_name -> pb.Profile.CreativesEntry
-	8, // 3: pb.Creative.creativeTargeting:type_name -> pb.Creative.CreativeTargetingEntry
+	8, // 3: pb.Profile.profilesTargeting:type_name -> pb.Profile.ProfilesTargetingEntry
 	2, // 4: pb.GetProfilesByZoneResponse.ProfilesByPackageEntry.value:type_name -> pb.ProfileIds
 	3, // 5: pb.GetProfilesByZoneResponse.ProfilesByUUIDEntry.value:type_name -> pb.Profile
 	4, // 6: pb.Profile.CreativesEntry.value:type_name -> pb.Creative

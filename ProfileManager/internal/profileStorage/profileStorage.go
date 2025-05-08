@@ -105,20 +105,21 @@ func (s *profileStorage) UpdateAll() error {
 		}
 		profileId := uuid.MustParse(p.Id)
 		profilesByUUID[profileId] = &model.Profile{
-			Id:        uuid.MustParse(p.Id),
-			Name:      p.Name,
-			Creatives: make(map[uuid.UUID]*model.Creative),
+			Id:               uuid.MustParse(p.Id),
+			Name:             p.Name,
+			BidPrice:         p.BidPrice,
+			Creatives:        make(map[uuid.UUID]*model.Creative),
+			ProfileTargeting: p.ProfileTargeting,
 		}
 
 		for _, creative := range p.Creatives {
 			creativeId := uuid.MustParse(creative.Id)
 			profilesByUUID[profileId].Creatives[creativeId] = &model.Creative{
-				ID:                creativeId,
-				MediaURL:          creative.MediaUrl,
-				Width:             creative.Width,
-				Height:            creative.Height,
-				CreativeType:      creative.CreativeType,
-				CreativeTargeting: creative.CreativeTargeting,
+				ID:           creativeId,
+				MediaURL:     creative.MediaUrl,
+				Width:        creative.Width,
+				Height:       creative.Height,
+				CreativeType: creative.CreativeType,
 			}
 		}
 	}

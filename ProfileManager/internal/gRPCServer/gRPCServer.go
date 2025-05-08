@@ -48,18 +48,19 @@ func (s *server) GetProfilesByZone(ctx context.Context, req *proto.GetProfileByZ
 		idString := id.String()
 
 		responseProfilesByIds[idString] = &proto.Profile{
-			Id:        idString,
-			Name:      profile.Name,
-			Creatives: make(map[string]*proto.Creative),
+			Id:                idString,
+			Name:              profile.Name,
+			BidPrice:          profile.BidPrice,
+			Creatives:         make(map[string]*proto.Creative),
+			ProfilesTargeting: profile.ProfileTargeting,
 		}
 		for creativeId, creative := range profile.Creatives {
 			responseProfilesByIds[idString].Creatives[creativeId.String()] = &proto.Creative{
-				Id:                creative.ID.String(),
-				MediaURL:          creative.MediaURL,
-				Width:             creative.Width,
-				Height:            creative.Height,
-				CreativeType:      creative.CreativeType,
-				CreativeTargeting: creative.CreativeTargeting,
+				Id:           creative.ID.String(),
+				MediaURL:     creative.MediaURL,
+				Width:        creative.Width,
+				Height:       creative.Height,
+				CreativeType: creative.CreativeType,
 			}
 		}
 	}

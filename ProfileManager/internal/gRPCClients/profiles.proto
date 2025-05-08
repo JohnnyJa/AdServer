@@ -16,14 +16,16 @@ message Creative {
   int32 width = 3;
   int32 height = 4;
   string creative_type = 5;
-  map<string, string> creative_targeting = 6;
 }
 
 message Profile {
   string id = 1;
   string name = 2;
-  map<string, Creative> creatives = 3; // map[uuid]string -> Creative
-  repeated string package_ids = 4;     // UUIDs як рядки
+  float bid_price = 3;
+  map<string, Creative> creatives = 4; // map[uuid]string -> Creative
+  repeated string package_ids = 5;     // UUIDs як рядки
+  map<string, string> profile_targeting = 6;
+
 }
 
 message GetProfilesResponse {

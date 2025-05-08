@@ -5,7 +5,9 @@ import (
 )
 
 type Profile struct {
-	Id        uuid.UUID
-	Name      string
-	Creatives map[uuid.UUID]*Creative
+	Id               uuid.UUID
+	Name             string
+	BidPrice         float32
+	Creatives        map[uuid.UUID]*Creative
+	ProfileTargeting map[string]string
 }
