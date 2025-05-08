@@ -67,7 +67,20 @@ services:
     networks:
       - profile-manager
 
-
+  bid-handler:
+    build:
+      context: ${PWD}/../BidHandler
+      dockerfile: ${PWD}/../BidHandler/Dockerfile
+    restart: always
+    ports:
+      - "8084:80"
+    environment:
+      APP_ENV: docker
+      APP_CONF_PATH: "/app/"
+    depends_on:
+      - profile-manager
+    networks:
+      - profile-manager
 
 #  redis:
 #    image: redis:latest
@@ -184,88 +197,88 @@ services:
     deploy:
       replicas: ${KAFKA_REPLICAS:-1}  # Default to 0, meaning Kafka won't start unless KAFKA_REPLICAS is set
 
-  pinot-controller:
-    image: ${PINOT_IMAGE:-apachepinot/pinot:1.2.0}
-    command: "StartController -zkAddress pinot-zookeeper:2181"
-    container_name: "pinot-controller"
-    restart: unless-stopped
-    ports:
-      - "9000:9000"
-    environment:
-      JAVA_OPTS: "-Dplugins.dir=/opt/pinot/plugins -Xms1G -Xmx4G -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -Xloggc:gc-pinot-controller.log"
-    depends_on:
-      pinot-zookeeper:
-        condition: service_healthy
-    networks:
-      - events-network
-    healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:9000/health || exit 1" ]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 10s
-
-  pinot-broker:
-    image: ${PINOT_IMAGE:-apachepinot/pinot:1.2.0}
-    command: "StartBroker -zkAddress pinot-zookeeper:2181"
-    container_name: "pinot-broker"
-    restart: unless-stopped
-    ports:
-      - "8099:8099"
-    environment:
-      JAVA_OPTS: "-Dplugins.dir=/opt/pinot/plugins -Xms4G -Xmx4G -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -Xloggc:gc-pinot-broker.log"
-    depends_on:
-      pinot-controller:
-        condition: service_healthy
-    networks:
-      - events-network
-    healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:8099/health || exit 1" ]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 10s
-
-  pinot-server:
-    image: ${PINOT_IMAGE:-apachepinot/pinot:1.2.0}
-    command: "StartServer -zkAddress pinot-zookeeper:2181"
-    container_name: "pinot-server"
-    restart: unless-stopped
-    ports:
-      - "8098:8098"
-    environment:
-      JAVA_OPTS: "-Dplugins.dir=/opt/pinot/plugins -Xms4G -Xmx16G -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -Xloggc:gc-pinot-server.log"
-    depends_on:
-      pinot-broker:
-        condition: service_healthy
-    networks:
-      - events-network
-    healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:8097/health/readiness || exit 1" ]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 10s
-  pinot-up:
-    image: curlimages/curl:latest
-    container_name: pinot-up
-    entrypoint: >
-      /bin/sh -c "
-        echo 'Creating schema...';
-        curl -X POST -H 'Content-Type: application/json' -d @/tmp/schema.json http://pinot-controller:9000/schemas &&
-        echo 'Creating table...';
-        curl -X POST -H 'Content-Type: application/json' -d @/tmp/table_config.json http://pinot-controller:9000/tables"
-    volumes:
-      - ./fs/pinot/event-schema.json:/tmp/schema.json
-      - ./fs/pinot/events-table.json:/tmp/table_config.json
-    networks:
-      - events-network
-    restart: "no"
-    depends_on:
-      pinot-controller:
-        condition: service_healthy
-    environment:
-      JAVA_OPTS: "-Xms1G -Xmx2G"
+#  pinot-controller:
+#    image: ${PINOT_IMAGE:-apachepinot/pinot:1.2.0}
+#    command: "StartController -zkAddress pinot-zookeeper:2181"
+#    container_name: "pinot-controller"
+#    restart: unless-stopped
+#    ports:
+#      - "9000:9000"
+#    environment:
+#      JAVA_OPTS: "-Dplugins.dir=/opt/pinot/plugins -Xms1G -Xmx4G -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -Xloggc:gc-pinot-controller.log"
+#    depends_on:
+#      pinot-zookeeper:
+#        condition: service_healthy
+#    networks:
+#      - events-network
+#    healthcheck:
+#      test: [ "CMD-SHELL", "curl -f http://localhost:9000/health || exit 1" ]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 5
+#      start_period: 10s
+#
+#  pinot-broker:
+#    image: ${PINOT_IMAGE:-apachepinot/pinot:1.2.0}
+#    command: "StartBroker -zkAddress pinot-zookeeper:2181"
+#    container_name: "pinot-broker"
+#    restart: unless-stopped
+#    ports:
+#      - "8099:8099"
+#    environment:
+#      JAVA_OPTS: "-Dplugins.dir=/opt/pinot/plugins -Xms4G -Xmx4G -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -Xloggc:gc-pinot-broker.log"
+#    depends_on:
+#      pinot-controller:
+#        condition: service_healthy
+#    networks:
+#      - events-network
+#    healthcheck:
+#      test: [ "CMD-SHELL", "curl -f http://localhost:8099/health || exit 1" ]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 5
+#      start_period: 10s
+#
+#  pinot-server:
+#    image: ${PINOT_IMAGE:-apachepinot/pinot:1.2.0}
+#    command: "StartServer -zkAddress pinot-zookeeper:2181"
+#    container_name: "pinot-app"
+#    restart: unless-stopped
+#    ports:
+#      - "8098:8098"
+#    environment:
+#      JAVA_OPTS: "-Dplugins.dir=/opt/pinot/plugins -Xms4G -Xmx16G -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -Xloggc:gc-pinot-app.log"
+#    depends_on:
+#      pinot-broker:
+#        condition: service_healthy
+#    networks:
+#      - events-network
+#    healthcheck:
+#      test: [ "CMD-SHELL", "curl -f http://localhost:8097/health/readiness || exit 1" ]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 5
+#      start_period: 10s
+#  pinot-up:
+#    image: curlimages/curl:latest
+#    container_name: pinot-up
+#    entrypoint: >
+#      /bin/sh -c "
+#        echo 'Creating schema...';
+#        curl -X POST -H 'Content-Type: application/json' -d @/tmp/schema.json http://pinot-controller:9000/schemas &&
+#        echo 'Creating table...';
+#        curl -X POST -H 'Content-Type: application/json' -d @/tmp/table_config.json http://pinot-controller:9000/tables"
+#    volumes:
+#      - ./fs/pinot/event-schema.json:/tmp/schema.json
+#      - ./fs/pinot/events-table.json:/tmp/table_config.json
+#    networks:
+#      - events-network
+#    restart: "no"
+#    depends_on:
+#      pinot-controller:
+#        condition: service_healthy
+#    environment:
+#      JAVA_OPTS: "-Xms1G -Xmx2G"
 
 networks:
   druid:

@@ -47,7 +47,7 @@ func (c *packageServiceClient) GetPackagesWithZones(ctx context.Context, in *Get
 	return out, nil
 }
 
-// PackageServiceServer is the server API for PackageService service.
+// PackageServiceServer is the app API for PackageService service.
 // All implementations must embed UnimplementedPackageServiceServer
 // for forward compatibility.
 type PackageServiceServer interface {

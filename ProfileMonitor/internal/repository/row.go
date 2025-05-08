@@ -5,6 +5,7 @@ import "github.com/google/uuid"
 type ProfileRow struct {
 	ProfileID      uuid.UUID   `db:"profile_id"`
 	ProfileName    string      `db:"profile_name"`
+	BidPrice       float64     `db:"bid_price"`
 	CreativeID     uuid.UUID   `db:"creative_id"`
 	MediaURL       string      `db:"media_url"`
 	Width          int         `db:"width"`

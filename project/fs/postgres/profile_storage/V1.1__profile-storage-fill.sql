@@ -1,29 +1,27 @@
--- Профайли
-INSERT INTO profiles (id, name, start_date, end_date)
+-- Insert into profiles
+INSERT INTO profiles (id, name, bid_price, start_date, end_date)
 VALUES
-    ('11111111-1111-1111-1111-111111111111', 'Profile A', now() - interval '1 day', now() + interval '5 days'),
-    ('22222222-2222-2222-2222-222222222222', 'Profile B', now() - interval '2 days', now() + interval '3 days'),
-    ('33333333-3333-3333-3333-333333333333', 'Expired Profile', now() - interval '10 days', now() - interval '5 days');
+    ('11111111-1111-1111-1111-111111111111', 'Summer Promo', 1.50, '2025-05-01 00:00:00+00', '2025-06-01 00:00:00+00'),
+    ('22222222-2222-2222-2222-222222222222', 'Winter Sale', 2.10, '2025-05-01 00:00:00+00', '2026-01-15 00:00:00+00');
 
--- Креативи
+-- Insert into creatives
 INSERT INTO creatives (id, profile_id, media_url, width, height, creative_type)
 VALUES
-    ('aaa11111-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', 'https://cdn.example.com/banner1.jpg', 300, 250, 'banner'),
-    ('aaa22222-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', 'https://cdn.example.com/banner2.jpg', 728, 90, 'banner'),
-    ('bbb11111-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '22222222-2222-2222-2222-222222222222', 'https://cdn.example.com/native1.jpg', 600, 400, 'native'),
-    ('ccc11111-cccc-cccc-cccc-cccccccccccc', '33333333-3333-3333-3333-333333333333', 'https://cdn.example.com/expired.jpg', 300, 250, 'banner');
+    ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', '11111111-1111-1111-1111-111111111111', 'https://cdn.example.com/banner1.jpg', 300, 250, 'banner'),
+    ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', '11111111-1111-1111-1111-111111111111', 'https://cdn.example.com/banner2.jpg', 728, 90, 'banner'),
+    ('cccccccc-cccc-cccc-cccc-cccccccccccc', '22222222-2222-2222-2222-222222222222', 'https://cdn.example.com/video1.mp4', 1920, 1080, 'video');
 
--- Таргетинги
-INSERT INTO creative_targeting (id, creative_id, key, value)
+-- Insert into profile_targeting
+INSERT INTO profile_targeting (id, profile_id, key, value)
 VALUES
-    ('ddd11111-dddd-dddd-dddd-dddddddddddd', 'aaa11111-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'geo', 'PL'),
-    ('ddd22222-dddd-dddd-dddd-dddddddddddd', 'aaa22222-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'geo', 'UA'),
-    ('ddd33333-dddd-dddd-dddd-dddddddddddd', 'bbb11111-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'os', 'Android'),
-    ('ddd44444-dddd-dddd-dddd-dddddddddddd', 'ccc11111-cccc-cccc-cccc-cccccccccccc', 'geo', 'DE');
+    ('aaaa1111-0000-0000-0000-000000000001', '11111111-1111-1111-1111-111111111111', 'geo', 'PL'),
+    ('aaaa1111-0000-0000-0000-000000000002', '11111111-1111-1111-1111-111111111111', 'os', 'Android'),
+    ('aaaa1111-0000-0000-0000-000000000003', '22222222-2222-2222-2222-222222222222', 'language', 'en'),
+    ('aaaa1111-0000-0000-0000-000000000004', '22222222-2222-2222-2222-222222222222', 'geo', 'US');
 
--- Профайл-Пакет звʼязки
+-- Insert into profile_package
 INSERT INTO profile_package (profile_id, package_id)
 VALUES
     ('11111111-1111-1111-1111-111111111111', '11111111-1111-1111-1111-111111111111'),
     ('22222222-2222-2222-2222-222222222222', '11111111-1111-1111-1111-111111111111'),
-    ('33333333-3333-3333-3333-333333333333', '22222222-2222-2222-2222-222222222222');
+    ('22222222-2222-2222-2222-222222222222', '22222222-2222-2222-2222-222222222222');
