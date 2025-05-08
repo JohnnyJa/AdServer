@@ -67,7 +67,20 @@ services:
     networks:
       - profile-manager
 
-
+  bid-handler:
+    build:
+      context: ${PWD}/../BidHandler
+      dockerfile: ${PWD}/../BidHandler/Dockerfile
+    restart: always
+    ports:
+      - "8084:80"
+    environment:
+      APP_ENV: docker
+      APP_CONF_PATH: "/app/"
+    depends_on:
+      - profile-manager
+    networks:
+      - profile-manager
 
 #  redis:
 #    image: redis:latest

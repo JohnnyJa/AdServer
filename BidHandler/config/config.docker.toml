@@ -1,0 +1,8 @@
+name = "BidHandler"
+log_level = "debug"
+
+[profiles]
+address = "profile-manager:80"
+
+[server]
+port = "80"

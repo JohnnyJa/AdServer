@@ -2,13 +2,14 @@ EVENT_COLLECTOR=eventCollector
 PROFILE_MONITOR=profileMonitor
 PACKAGE_SERVICE=packageService
 PROFILE_MANAGER=profileManager
+BID_HANDLER=bidHandler
 
 up:
 	@echo Starting Docker images...
 	docker compose up -d
 	@echo Docker Images started!
 
-up_build: build_event_collector build_profile_monitor build_package_service build_profile_manager
+up_build: build_event_collector build_profile_monitor build_package_service build_profile_manager build_bid_handler
 	@echo Stopping docker images \(if running...\)
 	docker compose down
 	@echo Building \(when requeired\) and starting docker images...
@@ -38,4 +39,9 @@ build_package_service:
 build_profile_manager:
 	@echo Building profileManager binary
 	chdir ../ProfileManager && set GOOS=linux && set GOARCH=amd64 && CGO_ENABLED=0 && go build -o ${PROFILE_MANAGER} ./cmd/api
+	@echo Done!
+
+build_bid_handler:
+	@echo Building bidHandler binary
+	chdir ../BidHandler && set GOOS=linux && set GOARCH=amd64 && set CGO_ENABLED=0 && go build -o ${BID_HANDLER} ./cmd/api
 	@echo Done!
