@@ -11,12 +11,14 @@ import (
 
 type server struct {
 	proto.UnimplementedProfilesServiceServer
+	proto.UnimplementedProfilesLimitsServiceServer
 	repo   repository.Repository
 	logger *logrus.Logger
 }
 
 func Register(gRPC *grpc.Server, repo repository.Repository, logger *logrus.Logger) {
 	proto.RegisterProfilesServiceServer(gRPC, &server{repo: repo, logger: logger})
+	proto.RegisterProfilesLimitsServiceServer(gRPC, &server{repo: repo, logger: logger})
 }
 
 func (s *server) GetActiveProfiles(ctx context.Context, in *proto.GetProfilesRequest) (*proto.GetProfilesResponse, error) {

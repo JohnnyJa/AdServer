@@ -261,138 +261,6 @@ func (x *GetProfilesResponse) GetProfiles() []*Profile {
 	return nil
 }
 
-type GetProfilesLimitsRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetProfilesLimitsRequest) Reset() {
-	*x = GetProfilesLimitsRequest{}
-	mi := &file_profiles_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetProfilesLimitsRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetProfilesLimitsRequest) ProtoMessage() {}
-
-func (x *GetProfilesLimitsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_profiles_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetProfilesLimitsRequest.ProtoReflect.Descriptor instead.
-func (*GetProfilesLimitsRequest) Descriptor() ([]byte, []int) {
-	return file_profiles_proto_rawDescGZIP(), []int{4}
-}
-
-type ProfilesWithLimits struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	ViewsLimits   int32                  `protobuf:"varint,2,opt,name=views_limits,json=viewsLimits,proto3" json:"views_limits,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ProfilesWithLimits) Reset() {
-	*x = ProfilesWithLimits{}
-	mi := &file_profiles_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ProfilesWithLimits) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ProfilesWithLimits) ProtoMessage() {}
-
-func (x *ProfilesWithLimits) ProtoReflect() protoreflect.Message {
-	mi := &file_profiles_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ProfilesWithLimits.ProtoReflect.Descriptor instead.
-func (*ProfilesWithLimits) Descriptor() ([]byte, []int) {
-	return file_profiles_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *ProfilesWithLimits) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *ProfilesWithLimits) GetViewsLimits() int32 {
-	if x != nil {
-		return x.ViewsLimits
-	}
-	return 0
-}
-
-type GetProfilesLimitsResponse struct {
-	state              protoimpl.MessageState `protogen:"open.v1"`
-	ProfilesWithLimits []*ProfilesWithLimits  `protobuf:"bytes,1,rep,name=profilesWithLimits,proto3" json:"profilesWithLimits,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
-}
-
-func (x *GetProfilesLimitsResponse) Reset() {
-	*x = GetProfilesLimitsResponse{}
-	mi := &file_profiles_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetProfilesLimitsResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetProfilesLimitsResponse) ProtoMessage() {}
-
-func (x *GetProfilesLimitsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_profiles_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetProfilesLimitsResponse.ProtoReflect.Descriptor instead.
-func (*GetProfilesLimitsResponse) Descriptor() ([]byte, []int) {
-	return file_profiles_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *GetProfilesLimitsResponse) GetProfilesWithLimits() []*ProfilesWithLimits {
-	if x != nil {
-		return x.ProfilesWithLimits
-	}
-	return nil
-}
-
 var File_profiles_proto protoreflect.FileDescriptor
 
 const file_profiles_proto_rawDesc = "" +
@@ -420,16 +288,9 @@ const file_profiles_proto_rawDesc = "" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"D\n" +
 	"\x13GetProfilesResponse\x12-\n" +
-	"\bprofiles\x18\x01 \x03(\v2\x11.profiles.ProfileR\bprofiles\"\x1a\n" +
-	"\x18GetProfilesLimitsRequest\"G\n" +
-	"\x12ProfilesWithLimits\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12!\n" +
-	"\fviews_limits\x18\x02 \x01(\x05R\vviewsLimits\"i\n" +
-	"\x19GetProfilesLimitsResponse\x12L\n" +
-	"\x12profilesWithLimits\x18\x01 \x03(\v2\x1c.profiles.ProfilesWithLimitsR\x12profilesWithLimits2\xc1\x01\n" +
+	"\bprofiles\x18\x01 \x03(\v2\x11.profiles.ProfileR\bprofiles2c\n" +
 	"\x0fProfilesService\x12P\n" +
-	"\x11GetActiveProfiles\x12\x1c.profiles.GetProfilesRequest\x1a\x1d.profiles.GetProfilesResponse\x12\\\n" +
-	"\x11GetProfilesLimits\x12\".profiles.GetProfilesLimitsRequest\x1a#.profiles.GetProfilesLimitsResponseB\bZ\x06/protob\x06proto3"
+	"\x11GetActiveProfiles\x12\x1c.profiles.GetProfilesRequest\x1a\x1d.profiles.GetProfilesResponseB\bZ\x06/protob\x06proto3"
 
 var (
 	file_profiles_proto_rawDescOnce sync.Once
@@ -443,33 +304,27 @@ func file_profiles_proto_rawDescGZIP() []byte {
 	return file_profiles_proto_rawDescData
 }
 
-var file_profiles_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_profiles_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_profiles_proto_goTypes = []any{
-	(*GetProfilesRequest)(nil),        // 0: profiles.GetProfilesRequest
-	(*Creative)(nil),                  // 1: profiles.Creative
-	(*Profile)(nil),                   // 2: profiles.Profile
-	(*GetProfilesResponse)(nil),       // 3: profiles.GetProfilesResponse
-	(*GetProfilesLimitsRequest)(nil),  // 4: profiles.GetProfilesLimitsRequest
-	(*ProfilesWithLimits)(nil),        // 5: profiles.ProfilesWithLimits
-	(*GetProfilesLimitsResponse)(nil), // 6: profiles.GetProfilesLimitsResponse
-	nil,                               // 7: profiles.Profile.CreativesEntry
-	nil,                               // 8: profiles.Profile.ProfileTargetingEntry
+	(*GetProfilesRequest)(nil),  // 0: profiles.GetProfilesRequest
+	(*Creative)(nil),            // 1: profiles.Creative
+	(*Profile)(nil),             // 2: profiles.Profile
+	(*GetProfilesResponse)(nil), // 3: profiles.GetProfilesResponse
+	nil,                         // 4: profiles.Profile.CreativesEntry
+	nil,                         // 5: profiles.Profile.ProfileTargetingEntry
 }
 var file_profiles_proto_depIdxs = []int32{
-	7, // 0: profiles.Profile.creatives:type_name -> profiles.Profile.CreativesEntry
-	8, // 1: profiles.Profile.profile_targeting:type_name -> profiles.Profile.ProfileTargetingEntry
+	4, // 0: profiles.Profile.creatives:type_name -> profiles.Profile.CreativesEntry
+	5, // 1: profiles.Profile.profile_targeting:type_name -> profiles.Profile.ProfileTargetingEntry
 	2, // 2: profiles.GetProfilesResponse.profiles:type_name -> profiles.Profile
-	5, // 3: profiles.GetProfilesLimitsResponse.profilesWithLimits:type_name -> profiles.ProfilesWithLimits
-	1, // 4: profiles.Profile.CreativesEntry.value:type_name -> profiles.Creative
-	0, // 5: profiles.ProfilesService.GetActiveProfiles:input_type -> profiles.GetProfilesRequest
-	4, // 6: profiles.ProfilesService.GetProfilesLimits:input_type -> profiles.GetProfilesLimitsRequest
-	3, // 7: profiles.ProfilesService.GetActiveProfiles:output_type -> profiles.GetProfilesResponse
-	6, // 8: profiles.ProfilesService.GetProfilesLimits:output_type -> profiles.GetProfilesLimitsResponse
-	7, // [7:9] is the sub-list for method output_type
-	5, // [5:7] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	1, // 3: profiles.Profile.CreativesEntry.value:type_name -> profiles.Creative
+	0, // 4: profiles.ProfilesService.GetActiveProfiles:input_type -> profiles.GetProfilesRequest
+	3, // 5: profiles.ProfilesService.GetActiveProfiles:output_type -> profiles.GetProfilesResponse
+	5, // [5:6] is the sub-list for method output_type
+	4, // [4:5] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_profiles_proto_init() }
@@ -483,7 +338,7 @@ func file_profiles_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_profiles_proto_rawDesc), len(file_profiles_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   9,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
