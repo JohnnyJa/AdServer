@@ -76,6 +76,21 @@ func ToGrpcProfiles(p map[uuid.UUID]*model.Profile) *proto.GetProfilesResponse {
 	return resp
 }
 
+func ToGrpcProfilesLimits(rows []repository.ProfileLimitsRow) *proto.GetProfilesLimitsResponse {
+	resp := &proto.GetProfilesLimitsResponse{
+		ProfilesWithLimits: make([]*proto.ProfilesWithLimits, 0),
+	}
+
+	for _, row := range rows {
+		pr := proto.ProfilesWithLimits{
+			Id:          row.ProfileID.String(),
+			ViewsLimits: int32(row.ViewsLimit),
+		}
+		resp.ProfilesWithLimits = append(resp.ProfilesWithLimits, &pr)
+	}
+	return resp
+}
+
 func ToKafkaProfile(p model.Profile) kafka.ProfileForKafka {
 	k := kafka.ProfileForKafka{
 		ID:        p.Id.String(),

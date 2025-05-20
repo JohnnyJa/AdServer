@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	ProfilesService_GetActiveProfiles_FullMethodName = "/profiles.ProfilesService/GetActiveProfiles"
+	ProfilesService_GetProfilesLimits_FullMethodName = "/profiles.ProfilesService/GetProfilesLimits"
 )
 
 // ProfilesServiceClient is the client API for ProfilesService service.
@@ -27,6 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ProfilesServiceClient interface {
 	GetActiveProfiles(ctx context.Context, in *GetProfilesRequest, opts ...grpc.CallOption) (*GetProfilesResponse, error)
+	GetProfilesLimits(ctx context.Context, in *GetProfilesLimitsRequest, opts ...grpc.CallOption) (*GetProfilesLimitsResponse, error)
 }
 
 type profilesServiceClient struct {
@@ -47,11 +49,22 @@ func (c *profilesServiceClient) GetActiveProfiles(ctx context.Context, in *GetPr
 	return out, nil
 }
 
+func (c *profilesServiceClient) GetProfilesLimits(ctx context.Context, in *GetProfilesLimitsRequest, opts ...grpc.CallOption) (*GetProfilesLimitsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetProfilesLimitsResponse)
+	err := c.cc.Invoke(ctx, ProfilesService_GetProfilesLimits_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ProfilesServiceServer is the server API for ProfilesService service.
 // All implementations must embed UnimplementedProfilesServiceServer
 // for forward compatibility.
 type ProfilesServiceServer interface {
 	GetActiveProfiles(context.Context, *GetProfilesRequest) (*GetProfilesResponse, error)
+	GetProfilesLimits(context.Context, *GetProfilesLimitsRequest) (*GetProfilesLimitsResponse, error)
 	mustEmbedUnimplementedProfilesServiceServer()
 }
 
@@ -64,6 +77,9 @@ type UnimplementedProfilesServiceServer struct{}
 
 func (UnimplementedProfilesServiceServer) GetActiveProfiles(context.Context, *GetProfilesRequest) (*GetProfilesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetActiveProfiles not implemented")
+}
+func (UnimplementedProfilesServiceServer) GetProfilesLimits(context.Context, *GetProfilesLimitsRequest) (*GetProfilesLimitsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetProfilesLimits not implemented")
 }
 func (UnimplementedProfilesServiceServer) mustEmbedUnimplementedProfilesServiceServer() {}
 func (UnimplementedProfilesServiceServer) testEmbeddedByValue()                         {}
@@ -104,6 +120,24 @@ func _ProfilesService_GetActiveProfiles_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ProfilesService_GetProfilesLimits_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetProfilesLimitsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProfilesServiceServer).GetProfilesLimits(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProfilesService_GetProfilesLimits_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProfilesServiceServer).GetProfilesLimits(ctx, req.(*GetProfilesLimitsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ProfilesService_ServiceDesc is the grpc.ServiceDesc for ProfilesService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -114,6 +148,10 @@ var ProfilesService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetActiveProfiles",
 			Handler:    _ProfilesService_GetActiveProfiles_Handler,
+		},
+		{
+			MethodName: "GetProfilesLimits",
+			Handler:    _ProfilesService_GetProfilesLimits_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

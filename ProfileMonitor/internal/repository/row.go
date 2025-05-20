@@ -15,3 +15,8 @@ type ProfileRow struct {
 	TargetingValue *string     `db:"value"`
 	PackageIDs     []uuid.UUID `db:"package_ids"`
 }
+
+type ProfileLimitsRow struct {
+	ProfileID  uuid.UUID `db:"profile_id"`
+	ViewsLimit int       `db:"profile_limit"`
+}

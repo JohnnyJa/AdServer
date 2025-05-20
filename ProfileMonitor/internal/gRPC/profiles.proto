@@ -6,6 +6,7 @@ option go_package = "/proto";
 
 service ProfilesService{
   rpc GetActiveProfiles (GetProfilesRequest) returns (GetProfilesResponse);
+  rpc GetProfilesLimits (GetProfilesLimitsRequest) returns (GetProfilesLimitsResponse);
 }
 
 message GetProfilesRequest{}
@@ -30,4 +31,15 @@ message Profile {
 
 message GetProfilesResponse {
   repeated Profile profiles = 1;
+}
+
+message GetProfilesLimitsRequest{}
+
+message ProfilesWithLimits {
+  string id = 1;
+  int32 views_limits = 2;
+}
+
+message GetProfilesLimitsResponse {
+  repeated ProfilesWithLimits profilesWithLimits = 1;
 }
