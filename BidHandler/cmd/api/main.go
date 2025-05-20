@@ -35,7 +35,6 @@ func CreateApp() fx.Option {
 			startServer,
 		),
 	)
-
 }
 
 func readConfig(config *app.Config) error {

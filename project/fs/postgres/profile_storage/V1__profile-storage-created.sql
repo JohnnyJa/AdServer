@@ -1,11 +1,12 @@
 CREATE TABLE profiles
 (
-    id         UUID PRIMARY KEY,
-    name       TEXT,
-    bid_price  FLOAT       NOT NULL,
-    start_date TIMESTAMPTZ NOT NULL,
-    end_date   TIMESTAMPTZ NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW()
+    id          UUID PRIMARY KEY,
+    name        TEXT,
+    bid_price   FLOAT       NOT NULL,
+    views_limit INT         NOT NULL,
+    start_date  TIMESTAMPTZ NOT NULL,
+    end_date    TIMESTAMPTZ NOT NULL,
+    created_at  TIMESTAMP DEFAULT NOW()
 );
 
 CREATE TABLE creatives
