@@ -6,10 +6,19 @@ import (
 )
 
 type Config struct {
-	Name     string `toml:"name"`
-	LogLevel string `toml:"log_level"`
-	//*ClientConfig `toml:"profiles"`
+	Name          string `toml:"name"`
+	LogLevel      string `toml:"log_level"`
+	*ClientConfig `toml:"profilesLimits"`
+	*RedisConfig  `toml:"redis"`
 	//*ServerConfig `toml:"server"`
+}
+
+type ClientConfig struct {
+	Address string `toml:"address"`
+}
+
+type RedisConfig struct {
+	ConnectionString string `toml:"connection_string"`
 }
 
 func NewConfig() *Config {
