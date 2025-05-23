@@ -6,6 +6,7 @@ import (
 	"github.com/JohnnyJa/AdServer/BidHandler/internal/mapper"
 	"github.com/JohnnyJa/AdServer/BidHandler/internal/model"
 	"github.com/JohnnyJa/AdServer/BidHandler/internal/requests"
+	"github.com/JohnnyJa/AdServer/BidHandler/internal/semanticTargetingService"
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 )
@@ -21,12 +22,14 @@ type decisionEngine struct {
 	request           requests.BidRequest
 	profilesByPackage map[uuid.UUID][]uuid.UUID
 	profilesByUUID    map[uuid.UUID]*model.Profile
+	semanticService   semanticTargetingService.SemanticTargetingService
 }
 
-func NewDecisionEngine(logger *logrus.Logger, profileService grpcClients.ProfilesClient) DecisionEngine {
+func NewDecisionEngine(logger *logrus.Logger, profileService grpcClients.ProfilesClient, semanticService semanticTargetingService.SemanticTargetingService) DecisionEngine {
 	return &decisionEngine{
-		logger:         logger,
-		profileService: profileService,
+		logger:          logger,
+		profileService:  profileService,
+		semanticService: semanticService,
 	}
 }
 
@@ -87,7 +90,7 @@ func (d *decisionEngine) getProfiles(ctx context.Context, id uuid.UUID) error {
 func (d *decisionEngine) findEligibleProfiles(imp requests.Imp) map[uuid.UUID]*model.ProfileWithMatchedCreative {
 	result := make(map[uuid.UUID]*model.ProfileWithMatchedCreative)
 	for id, profile := range d.profilesByUUID {
-		if profile.IsEligible(imp) {
+		if profile.IsEligible(imp, d.semanticService) {
 			matchedProfile := profile.FindMatchedCreative(imp)
 			if matchedProfile != nil {
 				result[id] = matchedProfile

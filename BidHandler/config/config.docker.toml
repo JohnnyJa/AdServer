@@ -6,3 +6,7 @@ address = "profile-manager:80"
 
 [server]
 port = "80"
+
+[semantic_targeting]
+path = "./dict"
+min_similarity = 0.5

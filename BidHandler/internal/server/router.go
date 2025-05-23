@@ -6,6 +6,7 @@ import (
 	"github.com/JohnnyJa/AdServer/BidHandler/internal/decisionEngine"
 	"github.com/JohnnyJa/AdServer/BidHandler/internal/grpcClients"
 	"github.com/JohnnyJa/AdServer/BidHandler/internal/requests"
+	"github.com/JohnnyJa/AdServer/BidHandler/internal/semanticTargetingService"
 	"github.com/JohnnyJa/AdServer/BidHandler/internal/service"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -14,7 +15,7 @@ import (
 
 type Server interface {
 	service.Service
-	ConfigureRoute(logger *logrus.Logger, client grpcClients.ProfilesClient) error
+	ConfigureRoute(logger *logrus.Logger, client grpcClients.ProfilesClient, service semanticTargetingService.SemanticTargetingService) error
 }
 
 type server struct {
@@ -32,7 +33,7 @@ func New(config *app.Config, logger *logrus.Logger) Server {
 	}
 }
 
-func (r *server) ConfigureRoute(logger *logrus.Logger, client grpcClients.ProfilesClient) error {
+func (r *server) ConfigureRoute(logger *logrus.Logger, client grpcClients.ProfilesClient, service semanticTargetingService.SemanticTargetingService) error {
 	r.gin.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
@@ -46,7 +47,7 @@ func (r *server) ConfigureRoute(logger *logrus.Logger, client grpcClients.Profil
 			return
 		}
 
-		decisionMaker := decisionEngine.NewDecisionEngine(logger, client)
+		decisionMaker := decisionEngine.NewDecisionEngine(logger, client, service)
 
 		bidResponse, err := decisionMaker.GetWinners(c.Request.Context(), bidRequest)
 		if err != nil {

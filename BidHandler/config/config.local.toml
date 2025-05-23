@@ -6,3 +6,7 @@ address = "localhost:8083"
 
 [server]
 port = "8084"
+
+[semantic_targeting]
+path = "./dict"
+min_similarity = 0.5

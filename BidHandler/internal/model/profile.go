@@ -2,6 +2,7 @@ package model
 
 import (
 	"github.com/JohnnyJa/AdServer/BidHandler/internal/requests"
+	"github.com/JohnnyJa/AdServer/BidHandler/internal/semanticTargetingService"
 	"github.com/google/uuid"
 	"math/rand"
 	"strings"
@@ -23,23 +24,21 @@ type ProfileWithMatchedCreative struct {
 	Creative         *Creative
 }
 
-func (p *Profile) IsEligible(imp requests.Imp) bool {
-	return p.IsBidPriceHigherThanBidFloor(imp) && p.IsTargetingMatched(imp)
+func (p *Profile) IsEligible(imp requests.Imp, service semanticTargetingService.SemanticTargetingService) bool {
+	return p.IsBidPriceHigherThanBidFloor(imp) && p.IsTargetingMatched(imp, service)
 }
 
 func (p *Profile) IsBidPriceHigherThanBidFloor(imp requests.Imp) bool {
 	return p.BidPrice >= imp.BidFloor
 }
 
-func (p *Profile) IsTargetingMatched(imp requests.Imp) bool {
+func (p *Profile) IsTargetingMatched(imp requests.Imp, service semanticTargetingService.SemanticTargetingService) bool {
 	if targeting, exist := p.ProfileTargeting["ImpTargeting"]; exist {
 		if imp.Ext == nil && imp.Ext.Targeting == nil {
 			return false
 		}
 
-		if !strings.EqualFold(targeting, imp.Ext.Targeting.Keyword) {
-			return false
-		}
+		return service.IsSimilar(strings.ToLower(imp.Ext.Targeting.Keyword), strings.ToLower(targeting))
 	}
 
 	return true
