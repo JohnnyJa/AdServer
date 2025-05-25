@@ -1,0 +1,16 @@
+name = "StateService"
+log_level = "debug"
+
+[profiles_limits]
+address = "profile-monitor:80"
+
+[redis]
+connection_string = "redis://:1@redis:6379/0"
+
+[manager]
+refresh_delay = "1s"
+
+[server]
+port = "80"
+
+

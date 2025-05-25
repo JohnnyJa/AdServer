@@ -4,6 +4,9 @@ log_level = "debug"
 [profiles]
 address = "profile-manager:80"
 
+[profile_state]
+address = "state-service:80"
+
 [server]
 port = "80"
 
