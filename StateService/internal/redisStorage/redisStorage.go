@@ -61,9 +61,25 @@ func (r *redisStorage) Stop(ctx context.Context) error {
 func (r *redisStorage) UpdateLimits(ctx context.Context, limits map[uuid.UUID]int) error {
 	pipe := r.client.Pipeline()
 
+	script := `
+local newLimit = tonumber(ARGV[1])
+local views = tonumber(redis.call("HGET", KEYS[1], "views") or "0")
+
+redis.call("HSET", KEYS[1], "limit", newLimit)
+
+if views >= newLimit then
+    redis.call("HSET", KEYS[1], "status", "stopped")
+else
+    redis.call("HSET", KEYS[1], "status", "active")
+end
+
+return 1
+`
+
 	for id, limit := range limits {
 		key := fmt.Sprintf("profile:%s", id.String())
-		pipe.HSet(ctx, key, "limit", limit)
+
+		pipe.Eval(ctx, script, []string{key}, limit)
 	}
 
 	_, err := pipe.Exec(ctx)
@@ -98,8 +114,7 @@ func (r *redisStorage) IncrementViews(ctx context.Context, profileId uuid.UUID) 
 		return err
 	}
 
-	vals := res.([]interface{})
-	updated := vals[0].(int64)
+	updated := res.(int64)
 	if updated == 1 {
 		r.logger.Infof("Profile %s was stopped", profileId.String())
 	}

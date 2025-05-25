@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "./proto";
+
+service UpdateCounterService {
+  rpc UpdateCounterOnProfile (UpdateCounterRequest) returns (UpdateCounterResponse);
+}
+
+message UpdateCounterRequest {
+  string profile_id = 1;
+}
+
+message UpdateCounterResponse {
+}

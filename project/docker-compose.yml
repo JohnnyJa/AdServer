@@ -83,25 +83,25 @@ services:
     networks:
       - profile-manager
 
-#  redis:
-#    image: redis:latest
-#    container_name: redis_container
-#    environment:
-#      - REDIS_PASSWORD=${REDIS_PASSWORD}
-#      - REDIS_PORT=6379
-#      - REDIS_DATABASES=16
-#    ports:
-#      - "6379:6379"
-#    volumes:
-#      - ${PWD}/fs/volumes/redis/data/:/data
-#      - ${PWD}/fs/volumes/redis/etc/:/usr/local/etc/redis
-#    healthcheck:
-#      test: [ "CMD", "redis-cli", "-a", "$REDIS_PASSWORD", "ping" ]
-#      interval: 30s
-#      timeout: 10s
-#      retries: 5
-#    networks:
-#      - eventCollector
+  redis:
+    image: redis:latest
+    container_name: redis_container
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_PORT=6379
+      - REDIS_DATABASES=16
+    ports:
+      - "6379:6379"
+    volumes:
+      - ${PWD}/fs/volumes/redis/data/:/data
+      - ${PWD}/fs/volumes/redis/etc/:/usr/local/etc/redis
+    healthcheck:
+      test: [ "CMD", "redis-cli", "-a", "$REDIS_PASSWORD", "ping" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - eventCollector
 
   postgres:
     image: postgres:latest

@@ -12,13 +12,13 @@ type ProfilesLimitsClient interface {
 }
 
 type profilesLimitsClient struct {
-	client
+	*client
 	service proto.ProfilesLimitsServiceClient
 }
 
-func NewProfileClient(config *app.Config) ProfilesLimitsClient {
+func NewProfileLimitClient(config *app.Config) ProfilesLimitsClient {
 	return &profilesLimitsClient{
-		client: client{config: config.ClientConfig},
+		client: &client{config: config.ClientConfig},
 	}
 }
 
