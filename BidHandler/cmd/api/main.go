@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/JohnnyJa/AdServer/BidHandler/internal/app"
 	"github.com/JohnnyJa/AdServer/BidHandler/internal/grpcClients"
+	"github.com/JohnnyJa/AdServer/BidHandler/internal/semanticTargetingService"
 	"github.com/JohnnyJa/AdServer/BidHandler/internal/server"
 	"github.com/sirupsen/logrus"
 	"go.uber.org/fx"
@@ -20,8 +21,15 @@ func CreateApp() fx.Option {
 			app.NewConfig,
 			logrus.New,
 			fx.Annotate(
+				semanticTargetingService.New,
+				fx.As(new(semanticTargetingService.SemanticTargetingService))),
+			fx.Annotate(
 				grpcClients.NewProfileClient,
 				fx.As(new(grpcClients.ProfilesClient)),
+			),
+			fx.Annotate(
+				grpcClients.NewProfileStateClient,
+				fx.As(new(grpcClients.ProfileStateClient)),
 			),
 			fx.Annotate(
 				server.New,
@@ -31,11 +39,12 @@ func CreateApp() fx.Option {
 		fx.Invoke(
 			readConfig,
 			configureLogger,
-			setupClient,
+			startSemanticService,
+			setupProfilesClient,
+			setupProfileStateClient,
 			startServer,
 		),
 	)
-
 }
 
 func readConfig(config *app.Config) error {
@@ -63,7 +72,15 @@ func configureLogger(config *app.Config, logger *logrus.Logger) error {
 	return nil
 }
 
-func setupClient(client grpcClients.ProfilesClient, lc fx.Lifecycle) error {
+func startSemanticService(service semanticTargetingService.SemanticTargetingService, lc fx.Lifecycle) error {
+	lc.Append(fx.Hook{
+		OnStart: service.Start,
+		OnStop:  service.Stop,
+	})
+	return nil
+}
+
+func setupProfilesClient(client grpcClients.ProfilesClient, lc fx.Lifecycle) error {
 	lc.Append(fx.Hook{
 		OnStart: client.Start,
 		OnStop:  client.Stop,
@@ -71,8 +88,16 @@ func setupClient(client grpcClients.ProfilesClient, lc fx.Lifecycle) error {
 	return nil
 }
 
-func startServer(srv server.Server, client grpcClients.ProfilesClient, logger *logrus.Logger, lc fx.Lifecycle) error {
-	err := srv.ConfigureRoute(logger, client)
+func setupProfileStateClient(client grpcClients.ProfileStateClient, lc fx.Lifecycle) error {
+	lc.Append(fx.Hook{
+		OnStart: client.Start,
+		OnStop:  client.Stop,
+	})
+	return nil
+}
+
+func startServer(srv server.Server, profilesClient grpcClients.ProfilesClient, profileStateClient grpcClients.ProfileStateClient, service semanticTargetingService.SemanticTargetingService, logger *logrus.Logger, lc fx.Lifecycle) error {
+	err := srv.ConfigureRoute(logger, profilesClient, profileStateClient, service)
 	if err != nil {
 		return err
 	}

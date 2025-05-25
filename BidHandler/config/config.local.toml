@@ -4,5 +4,12 @@ log_level = "debug"
 [profiles]
 address = "localhost:8083"
 
+[profile_state]
+address = "localhost:8086"
+
 [server]
 port = "8084"
+
+[semantic_targeting]
+path = "./dict"
+min_similarity = 0.5

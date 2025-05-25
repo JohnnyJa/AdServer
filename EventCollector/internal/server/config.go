@@ -1,12 +1,14 @@
 package server
 
 import (
+	"github.com/JohnnyJa/AdServer/EventCollector/internal/grpcClients"
 	"github.com/JohnnyJa/AdServer/EventCollector/internal/kafka"
 )
 
 type Config struct {
-	AppConfig   *AppConfig    `toml:"app"`
-	KafkaConfig *kafka.Config `toml:"kafka"`
+	AppConfig    *AppConfig                `toml:"app"`
+	KafkaConfig  *kafka.Config             `toml:"kafka"`
+	ClientConfig *grpcClients.ClientConfig `toml:"client"`
 }
 
 type AppConfig struct {

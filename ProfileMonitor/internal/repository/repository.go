@@ -11,6 +11,7 @@ import (
 type Repository interface {
 	service.Service
 	ReadProfiles(ctx context.Context) ([]ProfileRow, error)
+	ReadProfilesLimits(ctx context.Context) ([]ProfileLimitsRow, error)
 }
 
 type repository struct {
@@ -67,6 +68,36 @@ func (r *repository) ReadProfiles(ctx context.Context) ([]ProfileRow, error) {
 		return nil, fmt.Errorf("iteration error: %w", rows.Err())
 	}
 
+	return result, nil
+}
+
+func (r *repository) ReadProfilesLimits(ctx context.Context) ([]ProfileLimitsRow, error) {
+	rows, err := r.db.Query(ctx, `
+		SELECT
+    		profile_id, profile_limit
+		FROM profile_limit_view p
+`)
+	if err != nil {
+		return nil, fmt.Errorf("query profile_limit_view: %w", err)
+	}
+
+	defer rows.Close()
+	var result []ProfileLimitsRow
+	for rows.Next() {
+		var r ProfileLimitsRow
+		err := rows.Scan(
+			&r.ProfileID,
+			&r.ViewsLimit,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("scan profile_limit_view: %w", err)
+		}
+		result = append(result, r)
+	}
+
+	if rows.Err() != nil {
+		return nil, fmt.Errorf("iteration error: %w", rows.Err())
+	}
 	return result, nil
 }
 

@@ -5,3 +5,7 @@ log_level = "debug"
 
 [kafka]
 brokers = ["kafka:9093"]
+topic = "event-collector.events"
+
+[client]
+address = "state-service:80"

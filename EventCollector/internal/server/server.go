@@ -2,6 +2,7 @@ package server
 
 import (
 	"errors"
+	"github.com/JohnnyJa/AdServer/EventCollector/internal/grpcClients"
 	"github.com/JohnnyJa/AdServer/EventCollector/internal/kafka"
 	"github.com/JohnnyJa/AdServer/EventCollector/internal/router"
 	"github.com/sirupsen/logrus"
@@ -13,6 +14,7 @@ type Server struct {
 	logger *logrus.Logger
 	router router.Router
 	kafka  kafka.Kafka
+	client grpcClients.IncrementViewsClient
 }
 
 func New(config *Config) *Server {
@@ -28,6 +30,10 @@ func (s *Server) Start() error {
 	}
 
 	if err := s.configureKafka(); err != nil {
+		return err
+	}
+
+	if err := s.configureClient(); err != nil {
 		return err
 	}
 
@@ -60,6 +66,19 @@ func (s *Server) configureLogger() error {
 	return nil
 }
 
+func (s *Server) configureClient() error {
+
+	client := grpcClients.NewIncrementViewsClient(s.config.ClientConfig)
+
+	err := client.Start()
+	if err != nil {
+		return err
+	}
+
+	s.client = client
+	return nil
+}
+
 func (s *Server) configureRouter() error {
 
 	if s.logger == nil {
@@ -69,7 +88,7 @@ func (s *Server) configureRouter() error {
 		return errors.New("no kafka configured")
 	}
 
-	r := router.New(s.config.AppConfig.Port, s.logger, s.kafka)
+	r := router.New(s.config.AppConfig.Port, s.logger, s.kafka, s.client)
 	err := r.ConfigureRoute()
 	if err != nil {
 		return err

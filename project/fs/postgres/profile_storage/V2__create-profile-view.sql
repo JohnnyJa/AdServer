@@ -20,3 +20,5 @@ CREATE VIEW active_profile_view AS
             p.id, p.name, p.bid_price,
             c.id, c.media_url, c.width, c.height, c.creative_type,
             pt.key, pt.value;
+
+

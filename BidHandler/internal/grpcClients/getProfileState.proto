@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "./proto";
+
+service ProfileStateService {
+  rpc GetProfileState (GetProfileStateRequest) returns (GetProfileStateResponse);
+}
+
+message GetProfileStateRequest {
+  string profile_id = 1;
+}
+
+message GetProfileStateResponse {
+  int32 state = 1;
+}

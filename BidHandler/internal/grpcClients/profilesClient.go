@@ -19,7 +19,7 @@ type profilesClient struct {
 
 func NewProfileClient(config *app.Config) ProfilesClient {
 	return &profilesClient{
-		client: client{config: config.ClientConfig},
+		client: client{config: config.ProfilesClientConfig},
 	}
 }
 

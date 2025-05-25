@@ -31,3 +31,4 @@ message Profile {
 message GetProfilesResponse {
   repeated Profile profiles = 1;
 }
+
