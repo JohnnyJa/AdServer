@@ -4,6 +4,9 @@ log_level = "debug"
 [profiles]
 address = "localhost:8083"
 
+[profile_state]
+address = "localhost:8086"
+
 [server]
 port = "8084"
 

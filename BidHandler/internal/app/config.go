@@ -6,11 +6,12 @@ import (
 )
 
 type Config struct {
-	Name                     string `toml:"name"`
-	LogLevel                 string `toml:"log_level"`
-	*ClientConfig            `toml:"profiles"`
-	*ServerConfig            `toml:"server"`
-	*SemanticTargetingConfig `toml:"semantic_targeting"`
+	Name                      string        `toml:"name"`
+	LogLevel                  string        `toml:"log_level"`
+	ProfilesClientConfig      *ClientConfig `toml:"profiles"`
+	ProfilesStateClientConfig *ClientConfig `toml:"profile_state"`
+	*ServerConfig             `toml:"server"`
+	*SemanticTargetingConfig  `toml:"semantic_targeting"`
 }
 
 type ServerConfig struct {

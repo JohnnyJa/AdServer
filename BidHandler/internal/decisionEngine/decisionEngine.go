@@ -19,17 +19,19 @@ type decisionEngine struct {
 	profileService grpcClients.ProfilesClient
 	logger         *logrus.Logger
 
-	request           requests.BidRequest
-	profilesByPackage map[uuid.UUID][]uuid.UUID
-	profilesByUUID    map[uuid.UUID]*model.Profile
-	semanticService   semanticTargetingService.SemanticTargetingService
+	request            requests.BidRequest
+	profilesByPackage  map[uuid.UUID][]uuid.UUID
+	profilesByUUID     map[uuid.UUID]*model.Profile
+	semanticService    semanticTargetingService.SemanticTargetingService
+	profileStateClient grpcClients.ProfileStateClient
 }
 
-func NewDecisionEngine(logger *logrus.Logger, profileService grpcClients.ProfilesClient, semanticService semanticTargetingService.SemanticTargetingService) DecisionEngine {
+func NewDecisionEngine(logger *logrus.Logger, profileService grpcClients.ProfilesClient, profileStateClient grpcClients.ProfileStateClient, semanticService semanticTargetingService.SemanticTargetingService) DecisionEngine {
 	return &decisionEngine{
-		logger:          logger,
-		profileService:  profileService,
-		semanticService: semanticService,
+		logger:             logger,
+		profileService:     profileService,
+		profileStateClient: profileStateClient,
+		semanticService:    semanticService,
 	}
 }
 
@@ -44,7 +46,7 @@ func (d *decisionEngine) GetWinners(ctx context.Context, request requests.BidReq
 			return &requests.BidResponse{}, err
 		}
 
-		winner := d.makeDecision(imp)
+		winner := d.makeDecision(ctx, imp)
 
 		if winner != nil {
 			winners[uuid.MustParse(imp.ID)] = winner
@@ -58,8 +60,8 @@ func (d *decisionEngine) GetWinners(ctx context.Context, request requests.BidReq
 	return mapper.NewBidResponse(request, winners), nil
 }
 
-func (d *decisionEngine) makeDecision(imp requests.Imp) *model.ProfileWithMatchedCreative {
-	eligibleProfiles := d.findEligibleProfiles(imp)
+func (d *decisionEngine) makeDecision(ctx context.Context, imp requests.Imp) *model.ProfileWithMatchedCreative {
+	eligibleProfiles := d.findEligibleProfiles(ctx, imp)
 	winnerProfile := PerformAuction(eligibleProfiles)
 	return winnerProfile
 }
@@ -87,10 +89,10 @@ func (d *decisionEngine) getProfiles(ctx context.Context, id uuid.UUID) error {
 	return nil
 }
 
-func (d *decisionEngine) findEligibleProfiles(imp requests.Imp) map[uuid.UUID]*model.ProfileWithMatchedCreative {
+func (d *decisionEngine) findEligibleProfiles(ctx context.Context, imp requests.Imp) map[uuid.UUID]*model.ProfileWithMatchedCreative {
 	result := make(map[uuid.UUID]*model.ProfileWithMatchedCreative)
 	for id, profile := range d.profilesByUUID {
-		if profile.IsEligible(imp, d.semanticService) {
+		if d.IsProfileActive(ctx, id) && profile.IsEligible(imp, d.semanticService) {
 			matchedProfile := profile.FindMatchedCreative(imp)
 			if matchedProfile != nil {
 				result[id] = matchedProfile
@@ -98,4 +100,14 @@ func (d *decisionEngine) findEligibleProfiles(imp requests.Imp) map[uuid.UUID]*m
 		}
 	}
 	return result
+}
+
+func (d *decisionEngine) IsProfileActive(ctx context.Context, id uuid.UUID) bool {
+	state, err := d.profileStateClient.GetProfileState(ctx, id)
+	if err != nil {
+		logrus.Error(err)
+		return false
+	}
+
+	return state == 0
 }
